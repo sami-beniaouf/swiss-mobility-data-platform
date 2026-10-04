@@ -1,0 +1,51 @@
+version: 2
+
+models:
+  - name: dim_date
+    description: Calendar dimension (Monday = 1). Range set by vars in dbt_project.yml.
+    columns:
+      - name: date_key
+        description: yyyymmdd integer, joins to fct_departures.date_key
+        tests: [unique, not_null]
+
+  - name: dim_station
+    description: Stations from the Oracle hub with canton attributes and LV95 coordinates.
+    columns:
+      - name: station_id
+        tests: [unique, not_null]
+
+  - name: dim_line
+    description: One row per category + line number + operator.
+    columns:
+      - name: line_key
+        tests: [unique, not_null]
+
+  - name: fct_departures
+    description: >
+      Fact table, one row per scheduled departure at a station. Punctuality KPI in
+      Power BI = SUM(is_punctual) / SUM(has_realtime).
+    columns:
+      - name: departure_id
+        tests: [unique, not_null]
+      - name: station_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('dim_station')
+                field: station_id
+              config:
+                severity: warn
+      - name: line_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_line')
+                field: line_key
+      - name: date_key
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_key

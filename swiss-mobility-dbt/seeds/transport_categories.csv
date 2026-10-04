@@ -1,0 +1,14 @@
+category,transport_mode,category_label
+IC,train,InterCity
+ICE,train,InterCity-Express
+EC,train,EuroCity
+IR,train,InterRegio
+RE,train,RegioExpress
+R,train,Regio
+S,train,S-Bahn
+SN,train,Night S-Bahn
+B,bus,Bus
+BN,bus,Night bus
+T,tram,Tram
+FUN,funicular,Funicular
+BAT,boat,Boat

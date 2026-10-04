@@ -1,0 +1,14 @@
+version: 2
+
+models:
+  - name: int_departures__enriched
+    description: Departures with transport mode, local date/hour and punctuality flags.
+    columns:
+      - name: departure_id
+        tests: [unique, not_null]
+      - name: is_punctual
+        tests:
+          - accepted_values:
+              arguments:
+                values: [0, 1]
+                quote: false

@@ -1,0 +1,13 @@
+# Transformation
+dbt-core==1.12.5
+dbt-fabric==1.11.1
+
+# Ingestion / exploration
+requests==2.34.2
+pandas==3.0.6
+pyarrow==25.0.1
+oracledb==26.0.1        # thin mode, no Oracle client install needed
+python-dotenv==1.2.4
+
+# Notebooks
+jupyterlab==4.6.4

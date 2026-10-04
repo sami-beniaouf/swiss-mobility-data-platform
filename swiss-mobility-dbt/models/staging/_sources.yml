@@ -1,0 +1,59 @@
+version: 2
+
+sources:
+  - name: bronze_transport
+    description: >
+      Raw departures from transport.opendata.ch (/v1/stationboard), landed in the
+      Lakehouse by the PySpark notebook `nb_ingest_transport`. One row per departure
+      per poll, so the same departure appears several times (deduplicated in staging).
+    database: lh_mobility        # Lakehouse SQL endpoint, read cross-database from the Warehouse
+    schema: dbo
+    loaded_at_field: _ingested_at
+    freshness:
+      warn_after: {count: 6, period: hour}
+      error_after: {count: 24, period: hour}
+    tables:
+      - name: transport_stationboard
+        description: Flattened stationboard JSON. Timestamps written by Spark in UTC.
+        columns:
+          - name: station_id
+            description: DIDOK/BPUIC id of the polled station (stationboard.station.id)
+          - name: category
+            description: Train/bus category code (IC, IR, RE, S, B, T, ...)
+          - name: line_number
+            description: Line or train number (stationboard.number)
+          - name: operator
+          - name: destination
+            description: Final destination (stationboard.to)
+          - name: departure_planned_utc
+            description: Scheduled departure (stop.departure), UTC timestamp
+          - name: delay_min
+            description: Delay in minutes (stop.delay); null when no realtime data
+          - name: platform
+          - name: _ingested_at
+            description: When the notebook wrote the row (UTC)
+          - name: _batch_id
+            description: Notebook run id
+
+  - name: bronze_oracle
+    description: >
+      Reference data copied from the Oracle data hub by the Fabric pipeline
+      `pl_oracle_reference` (Copy activity via on-premises data gateway, full reload).
+    database: lh_mobility
+    schema: dbo
+    tables:
+      - name: oracle_stations
+        columns:
+          - name: station_id
+          - name: station_name
+          - name: municipality_bfs_nr
+          - name: canton_code
+          - name: lv95_e
+            description: Swiss LV95 easting (EPSG:2056)
+          - name: lv95_n
+            description: Swiss LV95 northing (EPSG:2056)
+      - name: oracle_cantons
+        columns:
+          - name: canton_code
+          - name: canton_name
+          - name: language_region

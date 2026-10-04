@@ -1,0 +1,57 @@
+# Swiss Mobility Data Platform: local development stack
+#
+#   docker compose up -d --build     start everything
+#   docker compose exec toolbox bash open a shell with dbt, az, sqlcmd, python
+#   docker compose down              stop (Oracle data is kept)
+#   docker compose down -v           stop AND wipe Oracle (init scripts rerun on next start)
+
+name: swiss-mobility
+
+services:
+
+  # Legacy "Oracle data hub" holding reference data (stations, cantons).
+  # Later, Fabric reads it through the on-premises data gateway installed on Windows,
+  # which connects to localhost:1521/FREEPDB1.
+  oracle:
+    image: gvenzl/oracle-free:23-slim
+    container_name: sm-oracle
+    environment:
+      ORACLE_PASSWORD: ${ORACLE_SYS_PASSWORD}
+      APP_USER: ${ORACLE_APP_USER}
+      APP_USER_PASSWORD: ${ORACLE_APP_PASSWORD}
+    ports:
+      - "127.0.0.1:1521:1521"        # localhost only, never exposed to your network
+    volumes:
+      - oracle-data:/opt/oracle/oradata
+      - ./oracle/init:/container-entrypoint-initdb.d:ro
+      - ./oracle/sql:/opt/mobility-sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh"]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 60s
+    restart: unless-stopped
+
+  # Development toolbox: Python, dbt-fabric, Azure CLI, ODBC Driver 18 + sqlcmd, JupyterLab.
+  toolbox:
+    build:
+      context: ./docker/toolbox
+    image: swiss-mobility/toolbox:latest
+    container_name: sm-toolbox
+    depends_on:
+      oracle:
+        condition: service_healthy
+    env_file: .env
+    environment:
+      ORACLE_DSN: oracle:1521/FREEPDB1   # service name inside the Docker network
+    ports:
+      - "127.0.0.1:8888:8888"        # JupyterLab
+    volumes:
+      - .:/workspace                  # the whole repo, edit files in VS Code on Windows
+      - azure-cli:/root/.azure        # keeps your `az login` between restarts
+    working_dir: /workspace
+
+volumes:
+  oracle-data:
+  azure-cli:

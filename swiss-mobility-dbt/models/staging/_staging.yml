@@ -1,0 +1,50 @@
+version: 2
+
+models:
+  - name: stg_transport__departures
+    description: Deduplicated, typed departures (latest poll per scheduled departure).
+    columns:
+      - name: departure_id
+        description: Surrogate key on station + category + line + scheduled time
+        tests: [unique, not_null]
+      - name: station_id
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_oracle__stations')
+                field: station_id
+              config:
+                severity: warn   # API may return stations not yet in the Oracle hub
+      - name: category
+        tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('transport_categories')
+                field: category
+              config:
+                severity: warn
+      - name: departure_planned_utc
+        tests: [not_null]
+
+  - name: stg_oracle__stations
+    columns:
+      - name: station_id
+        tests: [unique, not_null]
+      - name: canton_code
+        tests:
+          - relationships:
+              arguments:
+                to: ref('stg_oracle__cantons')
+                field: canton_code
+
+  - name: stg_oracle__cantons
+    columns:
+      - name: canton_code
+        tests: [unique, not_null]
+      - name: language_region
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['German', 'French', 'Italian', 'Bilingual', 'Multilingual']

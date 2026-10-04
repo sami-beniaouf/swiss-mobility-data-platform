@@ -1,0 +1,31 @@
+# Copy to ~/.dbt/profiles.yml (never commit the real one).
+# Prerequisites:
+#   pip install dbt-fabric
+#   Microsoft ODBC Driver 18 for SQL Server
+#   az login   (for authentication: CLI)
+
+swiss_mobility:
+  target: dev
+  outputs:
+    dev:
+      type: fabric
+      driver: "ODBC Driver 18 for SQL Server"
+      server: "<your-workspace-sql-endpoint>.datawarehouse.fabric.microsoft.com"
+      port: 1433
+      database: wh_mobility        # Fabric Warehouse (dev workspace)
+      schema: dbo
+      authentication: CLI
+      threads: 4
+
+    prod:
+      type: fabric
+      driver: "ODBC Driver 18 for SQL Server"
+      server: "<prod-workspace-sql-endpoint>.datawarehouse.fabric.microsoft.com"
+      port: 1433
+      database: wh_mobility
+      schema: dbo
+      authentication: ServicePrincipal
+      tenant_id: "{{ env_var('AZURE_TENANT_ID') }}"
+      client_id: "{{ env_var('AZURE_CLIENT_ID') }}"
+      client_secret: "{{ env_var('AZURE_CLIENT_SECRET') }}"
+      threads: 4

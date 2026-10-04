@@ -1,0 +1,21 @@
+# Secrets
+.env
+profiles.yml
+
+# Python / Jupyter
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.venv/
+
+# dbt
+swiss-mobility-dbt/target/
+swiss-mobility-dbt/dbt_packages/
+swiss-mobility-dbt/logs/
+
+# Local data extracts
+data/
+
+# OS
+.DS_Store
+Thumbs.db
