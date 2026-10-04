@@ -1,0 +1,6 @@
+# Shell scripts run inside Linux containers: they MUST keep LF line endings,
+# otherwise bash fails with "\r: command not found" when Git converts them on Windows.
+*.sh text eol=lf
+*.sql text eol=lf
+Dockerfile text eol=lf
+*.yml text eol=lf
