@@ -27,6 +27,8 @@ sources:
             description: Final destination (stationboard.to)
           - name: departure_planned_utc
             description: Scheduled departure (stop.departure), UTC timestamp
+          - name: departure_planned_raw
+            description: Scheduled departure in hu 
           - name: delay_min
             description: Delay in minutes (stop.delay); null when no realtime data
           - name: platform
