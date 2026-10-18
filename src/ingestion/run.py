@@ -39,7 +39,10 @@ def main() -> int:
 
     try:
         stations, station_source = load_stations()
-    except RuntimeError as exc:
+    except KeyError as exc:
+        log.error("Run %s aborted: missing environment variable %s", batch_id, exc)
+        return 1
+    except (ValueError, RuntimeError) as exc:
         log.error("Run %s aborted: %s", batch_id, exc)
         return 1
 

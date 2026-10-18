@@ -1,6 +1,8 @@
 # Secrets
 .env
 profiles.yml
+# Oracle Cloud wallet and other credential files
+secrets/
 
 # Python / Jupyter
 __pycache__/

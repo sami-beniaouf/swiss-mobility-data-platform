@@ -86,6 +86,19 @@ data/bronze/_ingestion_log/ingestion_date=YYYY-MM-DD/batch_<batch_id>.parquet   
 | More than 50 % of stations fail | logs are written, then the run exits with code 1 |
 | Oracle unavailable | cached station list used, warning logged; exit code 1 if no cache exists |
 
+### Station hub: local or cloud
+
+The ingestion reads the station list from the Oracle hub selected by `ORACLE_TARGET` in `.env`:
+
+| `ORACLE_TARGET` | Database | Connection |
+|---|---|---|
+| `local` (default) | Docker container `sm-oracle` | `ORACLE_DSN`, `ORACLE_APP_USER`, `ORACLE_APP_PASSWORD` |
+| `cloud` | Oracle Autonomous AI Database (Always Free, eu-zurich-1) | `ORACLE_CLOUD_*` + mTLS wallet in `secrets/oracle_wallet/` (git-ignored) |
+
+The cloud hub is created once with `oracle/cloud/load_hub_as_admin.sql` (run as ADMIN in Database Actions). The `mobility` user needs `CREATE SESSION`, `CREATE TABLE` and a quota on `DATA`.
+
+After changing `.env`, recreate the toolbox so it picks up the new values: `docker compose up -d --force-recreate toolbox`.
+
 ### Connecting dbt to Fabric (once the Fabric workspace exists)
 
 ```bash
