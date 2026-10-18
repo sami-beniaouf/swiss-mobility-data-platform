@@ -32,6 +32,8 @@ including a Tableau → Power BI report migration.
 | `oracle/sql/` | DDL + reference data for the Oracle hub (26 cantons, 16 stations) |
 | `oracle/init/` | Loads `oracle/sql/*.sql` on the first container start |
 | `scripts/check_setup.py` | Smoke test of the local stack |
+| `src/ingestion/` | Hourly ingestion job: stations from Oracle → stationboard API → bronze Parquet |
+| `notebooks/` | Exploration and design of the ingestion (API structure, retry policy, station loading) |
 | `swiss-mobility-dbt/` | dbt project (staging / intermediate / marts + tests) |
 
 ## Local setup (Windows)
@@ -62,6 +64,27 @@ docker compose logs -f oracle           # watch Oracle start / init scripts
 docker compose down                     # stop (data kept)
 docker compose down -v                  # stop and wipe Oracle; reference data reloads on next start
 ```
+
+### Running the ingestion
+
+```powershell
+docker compose exec toolbox python -m ingestion.run
+```
+
+Each run reads the station list from Oracle (cached in `data/state/` as a fallback), fetches the next departures of every station and appends two Parquet files, partitioned by ingestion day:
+
+```
+data/bronze/transport_stationboard/ingestion_date=YYYY-MM-DD/batch_<batch_id>.parquet   one row per departure
+data/bronze/_ingestion_log/ingestion_date=YYYY-MM-DD/batch_<batch_id>.parquet           one row per station
+```
+
+| Situation | Behaviour |
+|---|---|
+| Timeout, connection error, HTTP 429/5xx | retried with exponential backoff (2 s, 4 s), max 3 attempts |
+| Other HTTP error, departures of another station | station marked as failed, no retry |
+| One station fails | other stations continue; failure recorded in the ingestion log |
+| More than 50 % of stations fail | logs are written, then the run exits with code 1 |
+| Oracle unavailable | cached station list used, warning logged; exit code 1 if no cache exists |
 
 ### Connecting dbt to Fabric (once the Fabric workspace exists)
 

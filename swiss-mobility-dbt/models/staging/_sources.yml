@@ -4,8 +4,8 @@ sources:
   - name: bronze_transport
     description: >
       Raw departures from transport.opendata.ch (/v1/stationboard), landed in the
-      Lakehouse by the PySpark notebook `nb_ingest_transport`. One row per departure
-      per poll, so the same departure appears several times (deduplicated in staging).
+      Lakehouse by the hourly ingestion job (`src/ingestion`). Append-only: one row per
+      departure per run, so the same departure appears several times (deduplicated in staging).
     database: lh_mobility        # Lakehouse SQL endpoint, read cross-database from the Warehouse
     schema: dbo
     loaded_at_field: _ingested_at
@@ -14,7 +14,7 @@ sources:
       error_after: {count: 24, period: hour}
     tables:
       - name: transport_stationboard
-        description: Flattened stationboard JSON. Timestamps written by Spark in UTC.
+        description: Flattened stationboard JSON. All timestamps are UTC.
         columns:
           - name: station_id
             description: DIDOK/BPUIC id of the polled station (stationboard.station.id)
@@ -26,16 +26,16 @@ sources:
           - name: destination
             description: Final destination (stationboard.to)
           - name: departure_planned_utc
-            description: Scheduled departure (stop.departure), UTC timestamp
+            description: Scheduled departure in UTC, derived from stop.departureTimestamp (Unix epoch)
           - name: departure_planned_raw
-            description: Scheduled departure in hu 
+            description: Scheduled departure as returned by the API (stop.departure), local time with UTC offset, e.g. 2026-10-04T20:53:00+0200. Kept for traceability
           - name: delay_min
-            description: Delay in minutes (stop.delay); null when no realtime data
+            description: Delay in minutes (stop.delay); null when no real-time data is available (unknown, not on time)
           - name: platform
           - name: _ingested_at
-            description: When the notebook wrote the row (UTC)
+            description: Start time of the ingestion run that wrote the row (UTC)
           - name: _batch_id
-            description: Notebook run id
+            description: Ingestion run id (run start, UTC, YYYYMMDDTHHMMSSZ). Joins to the ingestion log
 
   - name: bronze_oracle
     description: >

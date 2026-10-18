@@ -45,6 +45,7 @@ services:
     env_file: .env
     environment:
       ORACLE_DSN: oracle:1521/FREEPDB1   # service name inside the Docker network
+      PYTHONPATH: /workspace/src         # makes `python -m ingestion.run` work from anywhere
     ports:
       - "127.0.0.1:8888:8888"        # JupyterLab
     volumes:
