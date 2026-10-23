@@ -7,6 +7,8 @@ requests==2.34.2
 pandas==3.0.6
 pyarrow==25.0.1
 oracledb==26.0.1        # thin mode, no Oracle client install needed
+azure-identity==1.26.0          # DefaultAzureCredential: managed identity in Azure, az login locally
+azure-storage-file-datalake==12.26.0
 python-dotenv==1.2.4
 
 # Notebooks

@@ -99,6 +99,17 @@ The cloud hub is created once with `oracle/cloud/load_hub_as_admin.sql` (run as 
 
 After changing `.env`, recreate the toolbox so it picks up the new values: `docker compose up -d --force-recreate toolbox`.
 
+### Storage: local or ADLS
+
+`STORAGE_TARGET` in `.env` selects where bronze files and the station cache are written:
+
+| `STORAGE_TARGET` | Location |
+|---|---|
+| `local` (default) | `data/bronze/…` and `data/state/stations_cache.json` |
+| `adls` | storage account `ADLS_ACCOUNT_NAME`, containers `bronze` and `state` |
+
+ADLS authentication uses `DefaultAzureCredential`: the managed identity of the Azure Function in production, the developer's `az login` in the toolbox. The identity needs the role **Storage Blob Data Contributor** on the storage account. Bronze files are written with `overwrite=False`, so an existing file is never replaced.
+
 ### Connecting dbt to Fabric (once the Fabric workspace exists)
 
 ```bash

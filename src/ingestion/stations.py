@@ -19,11 +19,9 @@ import json
 import logging
 import os
 from datetime import datetime, timezone
-from pathlib import Path
-
 import oracledb
 
-from ingestion.config import STATIONS_CACHE_PATH
+from ingestion.config import STATE_CONTAINER, STATIONS_CACHE_FILE
 
 log = logging.getLogger(__name__)
 
@@ -68,31 +66,30 @@ def _read_oracle(query, connect_kwargs):
             return [{"station_id": str(sid), "station_name": name} for sid, name in cur.fetchall()]
 
 
-def _write_cache(stations, source, cache_path: Path):
-    """Atomic write: a crash during the write never leaves a half-written cache."""
-    cache_path.parent.mkdir(parents=True, exist_ok=True)
+def _write_cache(storage, stations, source):
     payload = {
         "cached_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
         "source": source,
         "stations": stations,
     }
-    tmp_path = cache_path.with_suffix(".tmp")
-    tmp_path.write_text(json.dumps(payload, indent=2, ensure_ascii=False), encoding="utf-8")
-    os.replace(tmp_path, cache_path)
+    data = json.dumps(payload, indent=2, ensure_ascii=False).encode("utf-8")
+    storage.write_bytes(STATE_CONTAINER, STATIONS_CACHE_FILE, data, overwrite=True)
 
 
-def _read_cache(cache_path: Path):
-    if not cache_path.exists():
+def _read_cache(storage):
+    data = storage.read_bytes(STATE_CONTAINER, STATIONS_CACHE_FILE)
+    if data is None:
         return None
-    payload = json.loads(cache_path.read_text(encoding="utf-8"))
+    payload = json.loads(data.decode("utf-8"))
     if not payload.get("stations"):
         return None
     return payload["stations"], payload["cached_at"]
 
 
-def load_stations(cache_path=STATIONS_CACHE_PATH, query=STATION_QUERY, settings=None):
+def load_stations(storage, query=STATION_QUERY, settings=None):
     """Return (stations, source), source being "oracle:local", "oracle:cloud" or "cache".
 
+    The cache lives in the state container of `storage` (local folder or ADLS).
     `settings` overrides the environment, as returned by connection_settings() (used in tests).
     Raises RuntimeError when Oracle fails (or returns no station) and no cache is available.
     """
@@ -103,15 +100,16 @@ def load_stations(cache_path=STATIONS_CACHE_PATH, query=STATION_QUERY, settings=
         stations = _read_oracle(query, connect_kwargs)
         if not stations:
             raise ValueError("Oracle returned 0 stations")
-        _write_cache(stations, source, cache_path)
+        _write_cache(storage, stations, source)
         log.info("Loaded %d stations from %s, cache refreshed", len(stations), source)
         return stations, source
     except (oracledb.Error, ValueError) as exc:
         oracle_error = f"{type(exc).__name__}: {exc}".splitlines()[0]
 
-    cached = _read_cache(cache_path)
+    cached = _read_cache(storage)
     if cached is None:
-        raise RuntimeError(f"Station list unavailable: {source} failed ({oracle_error}) and no cache at {cache_path}")
+        cache_location = storage.describe(STATE_CONTAINER, STATIONS_CACHE_FILE)
+        raise RuntimeError(f"Station list unavailable: {source} failed ({oracle_error}) and no cache at {cache_location}")
 
     stations, cached_at = cached
     log.warning("%s unavailable (%s). Using %d cached stations from %s",

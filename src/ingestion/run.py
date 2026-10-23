@@ -1,10 +1,11 @@
-"""Hourly ingestion run.
+"""Ingestion run (scheduled every 15 minutes).
 
     python -m ingestion.run
 
 1. Load the station list (Oracle, cache fallback).
 2. Fetch the stationboard of every station; one failure does not stop the others.
-3. Write the departures and the ingestion log (one row per station) to bronze.
+3. Write the departures and the ingestion log (one row per station) to bronze
+   (local folder or ADLS, selected by STORAGE_TARGET).
 4. Exit with code 1 when more than MAX_FAILURE_RATIO of the stations failed,
    so that the scheduler marks the run as failed and raises an alert.
 """
@@ -17,13 +18,13 @@ import requests
 
 from ingestion.api import FetchError, fetch_stationboard
 from ingestion.config import (
-    BRONZE_DEPARTURES_DIR,
-    BRONZE_LOG_DIR,
+    DEPARTURES_DATASET,
+    INGESTION_LOG_DATASET,
     MAX_FAILURE_RATIO,
     PAUSE_BETWEEN_STATIONS_S,
 )
 from ingestion.stations import load_stations
-from ingestion.storage import write_batch
+from ingestion.storage import get_storage, write_batch
 from ingestion.transform import DEPARTURES_SCHEMA, INGESTION_LOG_SCHEMA, to_row
 
 log = logging.getLogger("ingestion")
@@ -31,6 +32,7 @@ log = logging.getLogger("ingestion")
 
 def main() -> int:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
+    logging.getLogger("azure").setLevel(logging.WARNING)      # keep Azure SDK request logs out of the run log
 
     run_started = datetime.now(timezone.utc).replace(microsecond=0)
     batch_id = run_started.strftime("%Y%m%dT%H%M%SZ")
@@ -38,7 +40,8 @@ def main() -> int:
     log.info("Run %s started", batch_id)
 
     try:
-        stations, station_source = load_stations()
+        storage = get_storage()
+        stations, station_source = load_stations(storage)
     except KeyError as exc:
         log.error("Run %s aborted: missing environment variable %s", batch_id, exc)
         return 1
@@ -80,10 +83,15 @@ def main() -> int:
                 time.sleep(PAUSE_BETWEEN_STATIONS_S)
 
     # The ingestion log is written in every case: it is the only trace of a run where all stations failed.
-    if departure_rows:
-        path = write_batch(departure_rows, DEPARTURES_SCHEMA, BRONZE_DEPARTURES_DIR, ingestion_date, batch_id)
-        log.info("Wrote %d departures to %s", len(departure_rows), path)
-    log_path = write_batch(log_rows, INGESTION_LOG_SCHEMA, BRONZE_LOG_DIR, ingestion_date, batch_id)
+    # A storage failure is systemic (permissions, network, account): the run fails.
+    try:
+        if departure_rows:
+            path = write_batch(storage, departure_rows, DEPARTURES_SCHEMA, DEPARTURES_DATASET, ingestion_date, batch_id)
+            log.info("Wrote %d departures to %s", len(departure_rows), path)
+        log_path = write_batch(storage, log_rows, INGESTION_LOG_SCHEMA, INGESTION_LOG_DATASET, ingestion_date, batch_id)
+    except Exception:
+        log.exception("Run %s failed: could not write to storage", batch_id)
+        return 1
 
     failed = sum(1 for r in log_rows if r["status"] == "failed")
     log.info("Run %s finished: %d/%d stations ok, %d failed. Log: %s",
