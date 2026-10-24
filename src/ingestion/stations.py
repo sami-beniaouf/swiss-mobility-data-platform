@@ -100,13 +100,24 @@ def load_stations(storage, query=STATION_QUERY, settings=None):
         stations = _read_oracle(query, connect_kwargs)
         if not stations:
             raise ValueError("Oracle returned 0 stations")
-        _write_cache(storage, stations, source)
-        log.info("Loaded %d stations from %s, cache refreshed", len(stations), source)
-        return stations, source
     except (oracledb.Error, ValueError) as exc:
         oracle_error = f"{type(exc).__name__}: {exc}".splitlines()[0]
+    else:
+        # The cache is a fallback only: failing to refresh it must not cost the departures of this run.
+        # A storage problem that also affects bronze makes the run fail when the batch is written.
+        try:
+            _write_cache(storage, stations, source)
+            log.info("Loaded %d stations from %s, cache refreshed", len(stations), source)
+        except Exception as exc:
+            log.warning("Loaded %d stations from %s, cache NOT refreshed (%s: %s)",
+                        len(stations), source, type(exc).__name__, str(exc).splitlines()[0])
+        return stations, source
 
-    cached = _read_cache(storage)
+    try:
+        cached = _read_cache(storage)
+    except Exception as exc:
+        log.error("Station cache unreadable (%s: %s)", type(exc).__name__, str(exc).splitlines()[0])
+        cached = None
     if cached is None:
         cache_location = storage.describe(STATE_CONTAINER, STATIONS_CACHE_FILE)
         raise RuntimeError(f"Station list unavailable: {source} failed ({oracle_error}) and no cache at {cache_location}")

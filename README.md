@@ -84,7 +84,9 @@ data/bronze/_ingestion_log/ingestion_date=YYYY-MM-DD/batch_<batch_id>.parquet   
 | Other HTTP error, departures of another station | station marked as failed, no retry |
 | One station fails | other stations continue; failure recorded in the ingestion log |
 | More than 50 % of stations fail | logs are written, then the run exits with code 1 |
-| Oracle unavailable | cached station list used, warning logged; exit code 1 if no cache exists |
+| Oracle unavailable | cached station list used, warning logged; exit code 1 if no cache exists or it cannot be read |
+| Station cache cannot be written | warning logged, departures still fetched |
+| Bronze file cannot be written | error logged, exit code 1 |
 
 ### Station hub: local or cloud
 
@@ -108,7 +110,22 @@ After changing `.env`, recreate the toolbox so it picks up the new values: `dock
 | `local` (default) | `data/bronze/…` and `data/state/stations_cache.json` |
 | `adls` | storage account `ADLS_ACCOUNT_NAME`, containers `bronze` and `state` |
 
-ADLS authentication uses `DefaultAzureCredential`: the managed identity of the Azure Function in production, the developer's `az login` in the toolbox. The identity needs the role **Storage Blob Data Contributor** on the storage account. Bronze files are written with `overwrite=False`, so an existing file is never replaced.
+ADLS authentication uses `DefaultAzureCredential`, so the same code runs everywhere and only the environment selects the identity:
+
+| Environment | Identity |
+|---|---|
+| Azure Function (production) | system-assigned managed identity, no secret |
+| Toolbox (local tests) | service principal `sp-swissmobility-local`: `AZURE_TENANT_ID`, `AZURE_CLIENT_ID`, `AZURE_CLIENT_SECRET` in `.env` (secret valid 90 days) |
+
+Each identity has the role **Storage Blob Data Contributor** on the storage account only. The containers `bronze` and `state` must exist; folders inside them are created on write.
+
+Bronze files are append-only: a file is created only if it does not exist yet (condition checked by the service), then its content is appended and committed. If the upload fails, the incomplete file is deleted, so the dataset never contains an empty Parquet file.
+
+Test run against ADLS without changing `.env`:
+
+```powershell
+docker compose exec -e STORAGE_TARGET=adls toolbox python -m ingestion.run
+```
 
 ### Connecting dbt to Fabric (once the Fabric workspace exists)
 
