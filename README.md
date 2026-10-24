@@ -4,7 +4,7 @@ End-to-end data platform on **Microsoft Fabric** using Swiss public transport op
 Oracle data hub + REST APIs → Fabric Lakehouse → dbt (Fabric Warehouse) → Power BI,
 including a Tableau → Power BI report migration.
 
-> Status: ingestion running in Azure every 15 minutes (Oracle Cloud hub → ADLS bronze). Fabric layer in progress.
+> Status: ingestion running in Azure every 15 minutes (Oracle Cloud hub → ADLS bronze), with failure and heartbeat alerts. Fabric layer in progress.
 
 ## Architecture
 
@@ -154,6 +154,31 @@ The Function authenticates with its system-assigned managed identity, which has 
 At startup, `function_app.py` decodes the wallet (`ewallet.pem`, base64 in Key Vault) into a temporary folder and sets `ORACLE_WALLET_DIR`. `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET` must not be set on the Function, otherwise `DefaultAzureCredential` would use the local service principal instead of the managed identity.
 
 Deployment: VS Code, Azure Functions extension, **Deploy to Function App** (`.vscode/settings.json` sets `src` as deployment folder, with remote build).
+
+### Monitoring and alerting
+
+Every invocation is recorded in Application Insights (table `requests`, one row per run). Two log search alert rules query it and notify the action group `ag-swissmobility-oncall` (email):
+
+| Rule | Query | Condition | Detects |
+|---|---|---|---|
+| `alert-ingestion-run-failed` | `requests` where `name == "ingest_stationboard"` and `success == false` | more than 0 rows in 15 min, evaluated every 15 min | a run ended with exit code 1: more than 50 % of stations failed, storage not writable, or no station list |
+| `alert-ingestion-heartbeat` | `requests` where `name == "ingest_stationboard"` and `success == true` | fewer than 1 row in 45 min, evaluated every 15 min | no successful run for three cycles: Function stopped or disabled, code not loading, timer not firing |
+
+Both rules have severity 1 and resolve automatically once a run succeeds. The heartbeat window tolerates two missed runs before alerting, to avoid false alarms on a single late start.
+
+Failures of individual stations do not alert: the run still succeeds and the failure is recorded in the ingestion log (`status = failed`, with the error message), to be reviewed in the data.
+
+Run history over the last hours:
+
+```kusto
+requests
+| where timestamp > ago(3h)
+| where name == "ingest_stationboard"
+| project timestamp, success, duration, resultCode
+| order by timestamp desc
+```
+
+Both rules were tested. A run was failed on purpose with an invalid `ORACLE_TARGET`: `alert-ingestion-run-failed` fired 6 minutes later and resolved after the next successful run. The Function was then disabled to simulate a silent stop: `alert-ingestion-heartbeat` fired and the email was delivered. The email address of an action group must be verified before notifications are delivered.
 
 ### Connecting dbt to Fabric (once the Fabric workspace exists)
 
