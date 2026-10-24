@@ -1,0 +1,8 @@
+# Runtime dependencies of the Azure Function (deployment root: src/).
+# Versions match docker/toolbox/requirements.txt so that local tests run the same code.
+azure-functions==2.3.0
+requests==2.34.2
+pyarrow==25.0.1
+oracledb==26.0.1
+azure-identity==1.26.0
+azure-storage-file-datalake==12.26.0

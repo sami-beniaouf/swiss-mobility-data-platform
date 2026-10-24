@@ -4,23 +4,25 @@ End-to-end data platform on **Microsoft Fabric** using Swiss public transport op
 Oracle data hub + REST APIs → Fabric Lakehouse → dbt (Fabric Warehouse) → Power BI,
 including a Tableau → Power BI report migration.
 
-> Status: local development stack ready (Oracle hub + toolbox). Fabric layer in progress.
+> Status: ingestion running in Azure every 15 minutes (Oracle Cloud hub → ADLS bronze). Fabric layer in progress.
 
 ## Architecture
 
 ```
- Oracle Free (Docker)            transport.opendata.ch (REST)
+ Oracle Autonomous DB            transport.opendata.ch (REST)
  stations, cantons                     departures
-        │  on-prem data gateway            │  PySpark notebook
-        ▼                                  ▼
- ┌──────────────────── Fabric Lakehouse (bronze) ────────────────────┐
- └────────────────────────────────┬──────────────────────────────────┘
-                                  │  dbt-fabric
-                                  ▼
-            Fabric Warehouse: staging → intermediate → marts (star schema)
-                                  │
-                                  ▼
-                        Power BI (Direct Lake)
+        │                                  │
+        └──────────────┬───────────────────┘
+                       │  Azure Function (timer, every 15 min)
+                       │  secrets from Key Vault, managed identity
+                       ▼
+        ADLS Gen2 stswissmobility: bronze (Parquet, partitioned by ingestion day)
+                       │  OneLake shortcut
+                       ▼
+ Fabric Lakehouse ──► dbt-fabric: staging → intermediate → marts (star schema)
+                       │
+                       ▼
+               Power BI (Direct Lake)
 ```
 
 ## Repository layout
@@ -32,7 +34,8 @@ including a Tableau → Power BI report migration.
 | `oracle/sql/` | DDL + reference data for the Oracle hub (26 cantons, 16 stations) |
 | `oracle/init/` | Loads `oracle/sql/*.sql` on the first container start |
 | `scripts/check_setup.py` | Smoke test of the local stack |
-| `src/ingestion/` | Hourly ingestion job: stations from Oracle → stationboard API → bronze Parquet |
+| `src/ingestion/` | Ingestion job: stations from Oracle → stationboard API → bronze Parquet |
+| `src/function_app.py`, `src/host.json`, `src/requirements.txt` | Azure Function wrapper (deployment root: `src/`) |
 | `notebooks/` | Exploration and design of the ingestion (API structure, retry policy, station loading) |
 | `swiss-mobility-dbt/` | dbt project (staging / intermediate / marts + tests) |
 
@@ -126,6 +129,31 @@ Test run against ADLS without changing `.env`:
 ```powershell
 docker compose exec -e STORAGE_TARGET=adls toolbox python -m ingestion.run
 ```
+
+### Production: Azure Function
+
+The ingestion runs in the Function App `func-swissmobility-sb` (Flex Consumption, Python 3.13, 512 MB), triggered every 15 minutes (`0 */15 * * * *`, UTC). The PC is not involved.
+
+| Resource | Purpose |
+|---|---|
+| `func-swissmobility-sb` | runs `ingestion.run.main()`; a non-zero exit code fails the invocation |
+| `kv-swissmobility-sb` (Key Vault) | `oracle-cloud-password`, `oracle-wallet-password`, `oracle-wallet-pem-b64` |
+| `stswissmobility` (ADLS Gen2) | containers `bronze` and `state` |
+| Application Insights | run logs and invocation history |
+
+The Function authenticates with its system-assigned managed identity, which has **Storage Blob Data Contributor** on `stswissmobility` and **Key Vault Secrets User** on the vault. No secret is stored in the app settings:
+
+| App setting | Value |
+|---|---|
+| `ORACLE_TARGET` / `STORAGE_TARGET` | `cloud` / `adls` |
+| `ADLS_ACCOUNT_NAME` | `stswissmobility` |
+| `ORACLE_CLOUD_USER` | `mobility` |
+| `ORACLE_CLOUD_DSN` | full connect descriptor (no `tnsnames.ora` in the Function) |
+| `ORACLE_CLOUD_PASSWORD`, `ORACLE_WALLET_PASSWORD`, `ORACLE_WALLET_PEM_B64` | `@Microsoft.KeyVault(VaultName=kv-swissmobility-sb;SecretName=…)` |
+
+At startup, `function_app.py` decodes the wallet (`ewallet.pem`, base64 in Key Vault) into a temporary folder and sets `ORACLE_WALLET_DIR`. `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET` must not be set on the Function, otherwise `DefaultAzureCredential` would use the local service principal instead of the managed identity.
+
+Deployment: VS Code, Azure Functions extension, **Deploy to Function App** (`.vscode/settings.json` sets `src` as deployment folder, with remote build).
 
 ### Connecting dbt to Fabric (once the Fabric workspace exists)
 

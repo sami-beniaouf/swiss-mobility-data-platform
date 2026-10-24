@@ -1,0 +1,6 @@
+{
+  "azureFunctions.deploySubpath": "src",
+  "azureFunctions.projectLanguage": "Python",
+  "azureFunctions.projectRuntime": "~4",
+  "azureFunctions.scmDoBuildDuringDeployment": true
+}
