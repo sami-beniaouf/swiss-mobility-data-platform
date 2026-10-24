@@ -41,7 +41,7 @@ def main() -> int:
 
     try:
         storage = get_storage()
-        stations, station_source = load_stations(storage)
+        stations, station_source, station_list_as_of = load_stations(storage)
     except KeyError as exc:
         log.error("Run %s aborted: missing environment variable %s", batch_id, exc)
         return 1
@@ -61,6 +61,7 @@ def main() -> int:
                 "station_id": station_id,
                 "station_name": station_name,
                 "station_source": station_source,
+                "station_list_as_of": station_list_as_of,
                 "started_at": started,
             }
             try:

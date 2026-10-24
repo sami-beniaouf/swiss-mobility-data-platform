@@ -66,9 +66,9 @@ def _read_oracle(query, connect_kwargs):
             return [{"station_id": str(sid), "station_name": name} for sid, name in cur.fetchall()]
 
 
-def _write_cache(storage, stations, source):
+def _write_cache(storage, stations, source, read_at):
     payload = {
-        "cached_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "cached_at": read_at.isoformat(timespec="seconds"),
         "source": source,
         "stations": stations,
     }
@@ -83,11 +83,15 @@ def _read_cache(storage):
     payload = json.loads(data.decode("utf-8"))
     if not payload.get("stations"):
         return None
-    return payload["stations"], payload["cached_at"]
+    return payload["stations"], datetime.fromisoformat(payload["cached_at"])
 
 
 def load_stations(storage, query=STATION_QUERY, settings=None):
-    """Return (stations, source), source being "oracle:local", "oracle:cloud" or "cache".
+    """Return (stations, source, as_of).
+
+    source is "oracle:local", "oracle:cloud" or "cache"; as_of is the UTC time the list was read
+    from Oracle (for the cache: the time the cached list was read), so the age of the list used
+    by a run is always started_at - as_of.
 
     The cache lives in the state container of `storage` (local folder or ADLS).
     `settings` overrides the environment, as returned by connection_settings() (used in tests).
@@ -98,6 +102,7 @@ def load_stations(storage, query=STATION_QUERY, settings=None):
 
     try:
         stations = _read_oracle(query, connect_kwargs)
+        read_at = datetime.now(timezone.utc).replace(microsecond=0)
         if not stations:
             raise ValueError("Oracle returned 0 stations")
     except (oracledb.Error, ValueError) as exc:
@@ -106,12 +111,12 @@ def load_stations(storage, query=STATION_QUERY, settings=None):
         # The cache is a fallback only: failing to refresh it must not cost the departures of this run.
         # A storage problem that also affects bronze makes the run fail when the batch is written.
         try:
-            _write_cache(storage, stations, source)
+            _write_cache(storage, stations, source, read_at)
             log.info("Loaded %d stations from %s, cache refreshed", len(stations), source)
         except Exception as exc:
             log.warning("Loaded %d stations from %s, cache NOT refreshed (%s: %s)",
                         len(stations), source, type(exc).__name__, str(exc).splitlines()[0])
-        return stations, source
+        return stations, source, read_at
 
     try:
         cached = _read_cache(storage)
@@ -124,5 +129,5 @@ def load_stations(storage, query=STATION_QUERY, settings=None):
 
     stations, cached_at = cached
     log.warning("%s unavailable (%s). Using %d cached stations from %s",
-                source, oracle_error, len(stations), cached_at)
-    return stations, "cache"
+                source, oracle_error, len(stations), cached_at.isoformat())
+    return stations, "cache", cached_at

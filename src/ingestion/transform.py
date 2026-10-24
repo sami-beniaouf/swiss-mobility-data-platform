@@ -27,6 +27,7 @@ INGESTION_LOG_SCHEMA = pa.schema([
     ("station_id", pa.string()),
     ("station_name", pa.string()),
     ("station_source", pa.string()),
+    ("station_list_as_of", UTC_TS),     # when the station list was read from Oracle (cache: when it was cached)
     ("status", pa.string()),
     ("rows", pa.int32()),
     ("attempts", pa.int32()),
