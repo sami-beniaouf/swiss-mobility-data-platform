@@ -1,12 +1,12 @@
-name: CI
+name: CI/CD
 
-# Runs on every push and on pull requests to main.
+# Lint and tests run on every push and on pull requests to main.
+# Deployment to Azure runs only on a push to main, and only when the tests passed.
 on:
   push:
   pull_request:
     branches: [main]
 
-# Read-only access to the repository is enough for linting and testing.
 permissions:
   contents: read
 
@@ -18,10 +18,10 @@ jobs:
 
     steps:
       - name: Check out the repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Set up Python 3.13 (same version as the Function)
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.13"
           cache: pip
@@ -37,3 +37,36 @@ jobs:
 
       - name: Run tests (pytest)
         run: pytest -v
+
+  deploy:
+    name: Deploy to Azure Functions
+    needs: test                                   # never deploy code whose tests failed
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    concurrency:
+      group: deploy-production                    # one deployment at a time, never cancelled midway
+      cancel-in-progress: false
+    permissions:
+      contents: read
+      id-token: write                             # lets the job request a GitHub OIDC token for Azure
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+
+      # Workload identity federation: no secret. Azure trusts tokens issued by GitHub for
+      # this repository and branch main only (federated credential on sp-swissmobility-github).
+      - name: Log in to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Deploy src/ to the Function App (remote build)
+        uses: Azure/functions-action@v1
+        with:
+          app-name: func-swissmobility-sb
+          package: src
+          remote-build: true
