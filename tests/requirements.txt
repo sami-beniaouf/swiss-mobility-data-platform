@@ -1,0 +1,6 @@
+# Test dependencies: the Function's runtime dependencies plus the test tools.
+# Tests run against exactly the libraries that are deployed.
+-r ../src/requirements.txt
+pytest==9.1.1
+PyYAML==6.0.3
+ruff==0.17.2

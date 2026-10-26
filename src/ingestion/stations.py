@@ -19,6 +19,7 @@ import json
 import logging
 import os
 from datetime import datetime, timezone
+
 import oracledb
 
 from ingestion.config import STATE_CONTAINER, STATIONS_CACHE_FILE

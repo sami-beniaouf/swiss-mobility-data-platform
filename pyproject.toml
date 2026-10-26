@@ -1,0 +1,18 @@
+# Tool configuration only: the repository is not a Python package.
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 120
+extend-exclude = ["notebooks"]
+
+[tool.ruff.lint]
+# pyflakes and pycodestyle errors, import order, likely bugs (bugbear), modern syntax
+select = ["E4", "E7", "E9", "F", "I", "B", "UP"]
+ignore = ["UP017"]     # timezone.utc is kept: explicit and identical to datetime.UTC
+
+[tool.ruff.lint.isort]
+known-first-party = ["ingestion"]

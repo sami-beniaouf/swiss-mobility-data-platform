@@ -16,3 +16,4 @@ jupyterlab==4.6.4
 
 # Tests (tests/, run in CI)
 pytest==9.1.1
+ruff==0.17.2
