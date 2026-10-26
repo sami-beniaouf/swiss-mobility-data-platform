@@ -38,6 +38,8 @@ including a Tableau → Power BI report migration.
 | `src/function_app.py`, `src/host.json`, `src/requirements.txt` | Azure Function wrapper (deployment root: `src/`) |
 | `notebooks/` | Exploration and design of the ingestion (API structure, retry policy, station loading) |
 | `swiss-mobility-dbt/` | dbt project (staging / intermediate / marts + tests) |
+| `tests/` | Unit tests of the ingestion (pytest), run in CI |
+| `.github/workflows/ci.yml` | CI/CD: lint and tests on every push, deployment to Azure from `main` |
 
 ## Local setup (Windows)
 
@@ -153,7 +155,7 @@ The Function authenticates with its system-assigned managed identity, which has 
 
 At startup, `function_app.py` decodes the wallet (`ewallet.pem`, base64 in Key Vault) into a temporary folder and sets `ORACLE_WALLET_DIR`. `AZURE_CLIENT_ID` / `AZURE_CLIENT_SECRET` must not be set on the Function, otherwise `DefaultAzureCredential` would use the local service principal instead of the managed identity.
 
-Deployment: VS Code, Azure Functions extension, **Deploy to Function App** (`.vscode/settings.json` sets `src` as deployment folder, with remote build).
+Deployment: automatic from GitHub Actions, see [CI/CD](#cicd).
 
 ### Monitoring and alerting
 
@@ -179,6 +181,34 @@ requests
 ```
 
 Both rules were tested. A run was failed on purpose with an invalid `ORACLE_TARGET`: `alert-ingestion-run-failed` fired 6 minutes later and resolved after the next successful run. The Function was then disabled to simulate a silent stop: `alert-ingestion-heartbeat` fired and the email was delivered. The email address of an action group must be verified before notifications are delivered.
+
+### CI/CD
+
+`.github/workflows/ci.yml` runs on GitHub Actions:
+
+```
+push (any branch) / pull request to main
+   └── test:   ruff check src tests  →  pytest (40 tests, no network, no secret)
+                  │ green, and push to main only
+                  ▼
+           deploy: azure/login (OIDC)  →  Azure/functions-action, package src/, remote build
+```
+
+| Job | Runs on | Purpose |
+|---|---|---|
+| `test` | every push and pull request | lint, then the unit tests against the Function's own dependencies (`tests/requirements.txt` includes `src/requirements.txt`) |
+| `deploy` | push to `main`, only if `test` passed | replaces the code of `func-swissmobility-sb`; one deployment at a time |
+
+The deploy job authenticates with **workload identity federation**: no secret is stored. The app registration `sp-swissmobility-github` trusts GitHub tokens for `repo:sami-beniaouf/swiss-mobility-data-platform`, branch `main` only, and has the role **Website Contributor** on the Function App only. The repository secrets `AZURE_CLIENT_ID`, `AZURE_TENANT_ID` and `AZURE_SUBSCRIPTION_ID` hold identifiers, not credentials; they are stored as secrets to keep them out of public logs.
+
+A push deploys the code in `src/` (including `host.json` and `requirements.txt`). App settings, Key Vault secrets, role assignments and alert rules are not part of the deployment: a new setting is added to the Function App before the code that uses it is pushed.
+
+Tests locally:
+
+```powershell
+docker compose exec toolbox ruff check src tests
+docker compose exec toolbox python -m pytest
+```
 
 ### Connecting dbt to Fabric (once the Fabric workspace exists)
 
