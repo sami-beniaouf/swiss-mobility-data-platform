@@ -1,4 +1,4 @@
-"""Azure Function: runs the ingestion every 15 minutes.
+"""Azure Functions: departures every 15 minutes, Oracle reference tables once a day.
 
 Deployment root is src/: this file, host.json, requirements.txt and the ingestion package.
 Configuration comes from the Function's app settings (same variable names as .env);
@@ -12,7 +12,7 @@ from pathlib import Path
 
 import azure.functions as func
 
-from ingestion.run import main
+from ingestion import reference, run
 
 app = func.FunctionApp()
 
@@ -34,15 +34,26 @@ def _prepare_wallet():
     os.environ["ORACLE_WALLET_DIR"] = str(wallet_dir)
 
 
+def _run(job, name):
+    """Run a job's main(); a non-zero exit code fails the invocation, so that it is counted
+    as a failure and raises the failed-run alert."""
+    _prepare_wallet()
+    exit_code = job()
+    if exit_code != 0:
+        raise RuntimeError(f"{name} failed with exit code {exit_code}, see the run log above")
+
+
 # NCRONTAB with seconds, evaluated in UTC: second 0 of minutes 0, 15, 30 and 45.
 @app.timer_trigger(arg_name="timer", schedule="0 */15 * * * *", run_on_startup=False, use_monitor=True)
 def ingest_stationboard(timer: func.TimerRequest) -> None:
     if timer.past_due:
         logging.warning("Timer is past due: the previous schedule was missed")
+    _run(run.main, "Ingestion run")
 
-    _prepare_wallet()
-    exit_code = main()
 
-    # A non-zero code must fail the invocation, so that it is counted as a failure and can raise an alert.
-    if exit_code != 0:
-        raise RuntimeError(f"Ingestion run failed with exit code {exit_code}, see the run log above")
+# Every day at 04:05 UTC, outside the nightly API maintenance window and off the quarter hours.
+@app.timer_trigger(arg_name="timer", schedule="0 5 4 * * *", run_on_startup=False, use_monitor=True)
+def export_reference(timer: func.TimerRequest) -> None:
+    if timer.past_due:
+        logging.warning("Timer is past due: the previous schedule was missed")
+    _run(reference.main, "Reference export")

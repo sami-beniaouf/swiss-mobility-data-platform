@@ -93,6 +93,21 @@ data/bronze/_ingestion_log/ingestion_date=YYYY-MM-DD/batch_<batch_id>.parquet   
 | Station cache cannot be written | warning logged, departures still fetched |
 | Bronze file cannot be written | error logged, exit code 1 |
 
+### Reference data export
+
+```powershell
+docker compose exec toolbox python -m ingestion.reference
+```
+
+Exports a full snapshot of the hub tables `stations` and `cantons` to bronze, once a day in production:
+
+```
+bronze/oracle_stations/ingestion_date=YYYY-MM-DD/batch_<batch_id>.parquet
+bronze/oracle_cantons/ingestion_date=YYYY-MM-DD/batch_<batch_id>.parquet
+```
+
+Both tables are read before anything is written, and a table with no row fails the run without writing: an empty snapshot would become the latest one and empty the station dimension. dbt staging keeps the latest snapshot (`max(_batch_id)`), so older snapshots remain as history.
+
 ### Station hub: local or cloud
 
 The ingestion reads the station list from the Oracle hub selected by `ORACLE_TARGET` in `.env`:
@@ -138,7 +153,7 @@ The ingestion runs in the Function App `func-swissmobility-sb` (Flex Consumption
 
 | Resource | Purpose |
 |---|---|
-| `func-swissmobility-sb` | runs `ingestion.run.main()`; a non-zero exit code fails the invocation |
+| `func-swissmobility-sb` | `ingest_stationboard` runs `ingestion.run.main()` every 15 minutes; `export_reference` runs `ingestion.reference.main()` daily at 04:05 UTC. A non-zero exit code fails the invocation |
 | `kv-swissmobility-sb` (Key Vault) | `oracle-cloud-password`, `oracle-wallet-password`, `oracle-wallet-pem-b64` |
 | `stswissmobility` (ADLS Gen2) | containers `bronze` and `state` |
 | Application Insights | run logs and invocation history |

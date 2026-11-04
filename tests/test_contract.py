@@ -6,8 +6,10 @@ NULLs downstream. These tests make such a change fail before deployment, so that
 made deliberately, together with the dbt sources.
 """
 import pyarrow as pa
+import pytest
 import yaml
 
+from ingestion.reference import CANTONS_SCHEMA, STATIONS_SCHEMA
 from ingestion.transform import DEPARTURES_SCHEMA, INGESTION_LOG_SCHEMA
 
 UTC_TS = pa.timestamp("us", tz="UTC")
@@ -41,6 +43,27 @@ EXPECTED_INGESTION_LOG = [
 ]
 
 
+EXPECTED_STATIONS = [
+    ("station_id", pa.string()),
+    ("station_name", pa.string()),
+    ("municipality_bfs_nr", pa.int32()),
+    ("canton_code", pa.string()),
+    ("lv95_e", pa.float64()),
+    ("lv95_n", pa.float64()),
+    ("updated_at", UTC_TS),
+    ("_extracted_at", UTC_TS),
+    ("_batch_id", pa.string()),
+]
+
+EXPECTED_CANTONS = [
+    ("canton_code", pa.string()),
+    ("canton_name", pa.string()),
+    ("language_region", pa.string()),
+    ("_extracted_at", UTC_TS),
+    ("_batch_id", pa.string()),
+]
+
+
 def _as_list(schema):
     return [(field.name, field.type) for field in schema]
 
@@ -53,12 +76,26 @@ def test_ingestion_log_schema_is_unchanged():
     assert _as_list(INGESTION_LOG_SCHEMA) == EXPECTED_INGESTION_LOG
 
 
-def test_dbt_source_declares_the_same_columns(repo_root):
+def test_reference_schemas_are_unchanged():
+    assert _as_list(STATIONS_SCHEMA) == EXPECTED_STATIONS
+    assert _as_list(CANTONS_SCHEMA) == EXPECTED_CANTONS
+
+
+def _declared_columns(repo_root, source_name, table_name):
     sources_file = repo_root / "swiss-mobility-dbt" / "models" / "staging" / "_sources.yml"
     sources = yaml.safe_load(sources_file.read_text(encoding="utf-8"))["sources"]
-    transport = next(s for s in sources if s["name"] == "bronze_transport")
-    table = next(t for t in transport["tables"] if t["name"] == "transport_stationboard")
+    source = next(s for s in sources if s["name"] == source_name)
+    table = next(t for t in source["tables"] if t["name"] == table_name)
+    return [column["name"] for column in table["columns"]]
 
-    declared = [column["name"] for column in table["columns"]]
-    written = [field.name for field in DEPARTURES_SCHEMA]
-    assert declared == written
+
+@pytest.mark.parametrize(
+    ("source_name", "table_name", "schema"),
+    [
+        ("bronze_transport", "transport_stationboard", DEPARTURES_SCHEMA),
+        ("bronze_oracle", "oracle_stations", STATIONS_SCHEMA),
+        ("bronze_oracle", "oracle_cantons", CANTONS_SCHEMA),
+    ],
+)
+def test_dbt_source_declares_the_same_columns(repo_root, source_name, table_name, schema):
+    assert _declared_columns(repo_root, source_name, table_name) == [field.name for field in schema]

@@ -39,23 +39,39 @@ sources:
 
   - name: bronze_oracle
     description: >
-      Reference data copied from the Oracle data hub by the Fabric pipeline
-      `pl_oracle_reference` (Copy activity via on-premises data gateway, full reload).
+      Reference data of the Oracle data hub, exported once a day by the Azure Function
+      (`src/ingestion/reference.py`) to ADLS bronze and loaded into the Lakehouse with the
+      departures. Each export is a full snapshot; staging keeps the latest one (`_batch_id`).
     database: lh_mobility
     schema: dbo
+    loaded_at_field: _extracted_at
+    freshness:
+      warn_after: {count: 30, period: hour}
+      error_after: {count: 72, period: hour}
     tables:
       - name: oracle_stations
         columns:
           - name: station_id
           - name: station_name
           - name: municipality_bfs_nr
+            description: Official BFS municipality number (verified against swissBOUNDARIES3D)
           - name: canton_code
           - name: lv95_e
             description: Swiss LV95 easting (EPSG:2056)
           - name: lv95_n
             description: Swiss LV95 northing (EPSG:2056)
+          - name: updated_at
+            description: Last change of the row in the hub (UTC)
+          - name: _extracted_at
+            description: Time of the export run (UTC)
+          - name: _batch_id
+            description: Export run id (UTC, YYYYMMDDTHHMMSSZ); the latest one is the current snapshot
       - name: oracle_cantons
         columns:
           - name: canton_code
           - name: canton_name
           - name: language_region
+          - name: _extracted_at
+            description: Time of the export run (UTC)
+          - name: _batch_id
+            description: Export run id (UTC, YYYYMMDDTHHMMSSZ); the latest one is the current snapshot

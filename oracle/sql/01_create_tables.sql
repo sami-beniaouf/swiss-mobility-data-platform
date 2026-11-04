@@ -1,6 +1,6 @@
 -- Reference tables of the "Oracle data hub".
--- Fabric copies them to the Lakehouse as oracle_cantons / oracle_stations
--- (see swiss-mobility-dbt/models/staging/_sources.yml).
+-- The Azure Function exports them daily to bronze as oracle_stations / oracle_cantons
+-- (src/ingestion/reference.py, swiss-mobility-dbt/models/staging/_sources.yml).
 
 WHENEVER SQLERROR EXIT FAILURE
 
