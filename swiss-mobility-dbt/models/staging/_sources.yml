@@ -4,7 +4,7 @@ sources:
   - name: bronze_transport
     description: >
       Raw departures from transport.opendata.ch (/v1/stationboard), landed in the
-      Lakehouse by the hourly ingestion job (`src/ingestion`). Append-only: one row per
+      Lakehouse by the ingestion job (`src/ingestion`, Azure Function every 15 minutes). Append-only: one row per
       departure per run, so the same departure appears several times (deduplicated in staging).
     database: lh_mobility        # Lakehouse SQL endpoint, read cross-database from the Warehouse
     schema: dbo

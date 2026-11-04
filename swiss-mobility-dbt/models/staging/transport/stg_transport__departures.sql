@@ -1,6 +1,13 @@
 -- One row per unique scheduled departure.
--- The notebook polls the stationboard repeatedly, so a departure is landed several
+-- The ingestion polls the stationboard every 15 minutes, so a departure is landed several
 -- times; keep the latest poll because it carries the most recent delay.
+--
+-- Key (from notebooks/05_bronze_profiling.ipynb): station + category + line + scheduled time
+-- + destination. Without the destination, branches of one line leaving at the same minute
+-- (e.g. S21 to Trogen and to Appenzell at St. Gallen) would be merged into one departure.
+-- The API sometimes lists one departure twice in the same poll, one copy with the delay and
+-- one with the platform: the tie-break keeps the copy with a known delay, so the result is
+-- deterministic.
 
 with source as (
 
@@ -32,15 +39,18 @@ deduplicated as (
     select
         *,
         row_number() over (
-            partition by station_id, category, line_number, departure_planned_utc
-            order by ingested_at_utc desc
+            partition by station_id, category, line_number, departure_planned_utc, destination
+            order by
+                ingested_at_utc desc,
+                case when delay_min is not null then 0 else 1 end,
+                case when platform is not null then 0 else 1 end
         ) as poll_rank
     from typed
 
 )
 
 select
-    {{ surrogate_key(['station_id', 'category', 'line_number', 'departure_planned_utc']) }} as departure_id,
+    {{ surrogate_key(['station_id', 'category', 'line_number', 'departure_planned_utc', 'destination']) }} as departure_id,
     station_id,
     category,
     line_number,

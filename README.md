@@ -223,3 +223,14 @@ cd swiss-mobility-dbt && dbt debug
 
 - **transport.opendata.ch**: departures (stationboard). Note: in `/v1/locations`, `coordinate.x` is the latitude and `coordinate.y` the longitude.
 - **Oracle hub (simulated)**: stations (BPUIC id, BFS municipality number, LV95 coordinates) and cantons (language region).
+
+### Known limitations
+
+Established by profiling the bronze data (`notebooks/05_bronze_profiling.ipynb`):
+
+| Limitation | Effect | Handling |
+|---|---|---|
+| The stationboard API has no cancellation information | cancelled departures cannot be identified | punctuality covers departures that ran with real-time data |
+| Real-time coverage varies by category (S, IR, IC, RE, R: 85-94 %; ICE 45 %; night S-Bahn 32 %) | punctuality of low-coverage categories rests on few departures | reports show the coverage (`has_realtime`) next to the punctuality rate |
+| A few cross-border departures have two train numbers (e.g. IR 36 / ICE 109 from Basel, 0.07 % of departures) | counted as two departures | accepted |
+| The API is unreachable for a few minutes most nights | the stations polled during the outage have no departures in that batch; departures are still captured by the following polls | failed station calls are recorded in the ingestion log; the run fails and alerts above 50 % |

@@ -5,7 +5,7 @@ models:
     description: Deduplicated, typed departures (latest poll per scheduled departure).
     columns:
       - name: departure_id
-        description: Surrogate key on station + category + line + scheduled time
+        description: Surrogate key on station + category + line + scheduled time + destination
         tests: [unique, not_null]
       - name: station_id
         tests:

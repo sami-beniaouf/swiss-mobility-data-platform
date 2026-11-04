@@ -12,3 +12,9 @@ BN,bus,Night bus
 T,tram,Tram
 FUN,funicular,Funicular
 BAT,boat,Boat
+TER,train,TER regional (France)
+TGV,train,TGV high-speed (France)
+PE,train,Panorama Express
+NJ,train,Nightjet
+RJX,train,Railjet Xpress
+EXT,train,Extra train
