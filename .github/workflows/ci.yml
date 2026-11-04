@@ -1,7 +1,7 @@
 name: CI/CD
 
-# Lint and tests run on every push and on pull requests to main.
-# Deployment to Azure runs only on a push to main, and only when the tests passed.
+# Lint, tests and the dbt parse check run on every push and on pull requests to main.
+# Deployment to Azure runs only on a push to main, and only when all checks passed.
 on:
   push:
   pull_request:
@@ -38,9 +38,38 @@ jobs:
       - name: Run tests (pytest)
         run: pytest -v
 
+  dbt:
+    name: Parse the dbt project
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: swiss-mobility-dbt
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: swiss-mobility-dbt/ci/requirements.txt
+
+      - name: Install dbt
+        run: pip install -r ci/requirements.txt
+
+      # Checks SQL/Jinja syntax, ref() and source() links and the YAML files, without
+      # connecting to the Warehouse (ci/profiles.yml only holds a placeholder server).
+      - name: Parse the project (dbt parse)
+        run: dbt parse
+        env:
+          DBT_PROFILES_DIR: ci
+
   deploy:
     name: Deploy to Azure Functions
-    needs: test                                   # never deploy code whose tests failed
+    needs: [test, dbt]                            # deploy only when every check passed
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     timeout-minutes: 15
