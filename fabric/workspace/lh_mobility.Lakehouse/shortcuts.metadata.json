@@ -1,0 +1,14 @@
+[
+  {
+    "name": "bronze",
+    "path": "/Files",
+    "target": {
+      "type": "AdlsGen2",
+      "adlsGen2": {
+        "connectionId": "edbff613-8807-44c6-a9f3-1e3a09488e41",
+        "location": "https://stswissmobility.dfs.core.windows.net",
+        "subpath": "/bronze"
+      }
+    }
+  }
+]
