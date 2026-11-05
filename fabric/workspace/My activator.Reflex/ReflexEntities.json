@@ -1,0 +1,68 @@
+[
+  {
+    "uniqueIdentifier": "7bcd6a3e-cf67-495a-bcbd-ff0e2e1f921a",
+    "payload": {
+      "name": "nb_load_bronze",
+      "description": "Container Description",
+      "type": "rthSubscriptions"
+    },
+    "type": "container-v1"
+  },
+  {
+    "uniqueIdentifier": "b3d7e16b-632a-406b-9360-7116aabca1b0",
+    "payload": {
+      "name": "ws-swiss-mobility event",
+      "connection": {
+        "scope": "Artifact",
+        "tenantId": "4bca15f9-fce0-45ee-8860-ecc268b75f89",
+        "workspaceId": "22fe9bbc-1832-46de-b32d-e39587b517d3",
+        "artifactId": "5aa46d1e-29d8-454d-bf69-30dc0deabb33",
+        "eventGroupType": "Microsoft.Fabric.JobEvents"
+      },
+      "filterSettings": {
+        "eventTypes": [
+          {
+            "name": "Microsoft.Fabric.JobEvents.ItemJobFailed"
+          }
+        ],
+        "filters": []
+      },
+      "parentContainer": {
+        "targetUniqueIdentifier": "7bcd6a3e-cf67-495a-bcbd-ff0e2e1f921a"
+      }
+    },
+    "type": "realTimeHubSource-v1"
+  },
+  {
+    "uniqueIdentifier": "5322dcdd-94ad-4583-ae94-84f578074ca0",
+    "payload": {
+      "name": "ws-swiss-mobility event",
+      "parentContainer": {
+        "targetUniqueIdentifier": "7bcd6a3e-cf67-495a-bcbd-ff0e2e1f921a"
+      },
+      "definition": {
+        "type": "Event",
+        "instance": "{\"steps\":[{\"id\":\"2fb89a4c-2b39-4bcb-b7c2-831f76a0ea23\",\"name\":\"SourceEventStep\",\"rows\":[{\"arguments\":[{\"name\":\"entityId\",\"type\":\"string\",\"value\":\"b3d7e16b-632a-406b-9360-7116aabca1b0\"}],\"kind\":\"SourceReference\",\"name\":\"SourceSelector\"}]}],\"templateId\":\"SourceEvent\",\"templateVersion\":\"1.3.1\"}"
+      }
+    },
+    "type": "timeSeriesView-v1"
+  },
+  {
+    "uniqueIdentifier": "37a75ac6-6c53-4b8c-88f6-35d05021657c",
+    "payload": {
+      "name": "job-failed-alert",
+      "parentContainer": {
+        "targetUniqueIdentifier": "7bcd6a3e-cf67-495a-bcbd-ff0e2e1f921a"
+      },
+      "definition": {
+        "type": "Rule",
+        "instance": "{\"templateId\":\"EventTrigger\",\"templateVersion\":\"1.3.1\",\"steps\":[{\"name\":\"FieldsDefaultsStep\",\"id\":\"d7574d3b-412c-48b6-8192-58bb2eedb854\",\"rows\":[{\"name\":\"EventSelector\",\"kind\":\"Event\",\"arguments\":[{\"kind\":\"EventReference\",\"type\":\"complex\",\"arguments\":[{\"name\":\"entityId\",\"type\":\"string\",\"value\":\"5322dcdd-94ad-4583-ae94-84f578074ca0\"}],\"name\":\"event\"}]}]},{\"name\":\"EventDetectStep\",\"id\":\"f5ae334b-d8b8-4445-a557-7ca7c6fb690d\",\"rows\":[{\"name\":\"OnEveryValue\",\"kind\":\"OnEveryValue\",\"arguments\":[]}]},{\"name\":\"ActStep\",\"id\":\"3edb8f32-0021-403b-841e-961e4c1f9e3e\",\"rows\":[{\"name\":\"EmailBinding\",\"kind\":\"EmailMessage\",\"arguments\":[{\"name\":\"messageLocale\",\"type\":\"string\",\"value\":\"en-us\"},{\"name\":\"sentTo\",\"type\":\"array\",\"values\":[{\"type\":\"string\",\"value\":\"samibeni@sbeniaoufgmail.onmicrosoft.com\"},{\"type\":\"string\",\"value\":\"sbeniaouf_gmail.com#EXT#@sbeniaoufgmail.onmicrosoft.com\"}]},{\"name\":\"copyTo\",\"type\":\"array\",\"values\":[]},{\"name\":\"bCCTo\",\"type\":\"array\",\"values\":[]},{\"name\":\"subject\",\"type\":\"array\",\"values\":[{\"type\":\"string\",\"value\":\"Activator alert job-failed-alert\"}]},{\"name\":\"headline\",\"type\":\"array\",\"values\":[{\"type\":\"string\",\"value\":\"The notebook job failed\"}]},{\"name\":\"optionalMessage\",\"type\":\"array\",\"values\":[{\"type\":\"string\",\"value\":\"\"}]},{\"name\":\"additionalInformation\",\"type\":\"array\",\"values\":[]}]}]}]}",
+        "settings": {
+          "shouldRun": true,
+          "shouldApplyRuleOnUpdate": false
+        }
+      }
+    },
+    "type": "timeSeriesView-v1"
+  }
+]
