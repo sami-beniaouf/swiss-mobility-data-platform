@@ -37,7 +37,7 @@ including a Tableau → Power BI report migration.
 | `src/ingestion/` | Ingestion job: stations from Oracle → stationboard API → bronze Parquet |
 | `src/function_app.py`, `src/host.json`, `src/requirements.txt` | Azure Function wrapper (deployment root: `src/`) |
 | `notebooks/` | Exploration and design: API structure, retry policy, station loading, polling coverage (01-04), bronze profiling (05), reference data check against swissBOUNDARIES3D (06) |
-| `fabric/` | Source of the Fabric notebook that loads bronze into Delta tables |
+| `fabric/workspace/` | Fabric workspace items synced by Fabric Git integration: Lakehouse and shortcut definitions, the bronze loading notebook, the Warehouse objects |
 | `swiss-mobility-dbt/` | dbt project (staging / intermediate / marts + tests) |
 | `tests/` | Unit tests of the ingestion (pytest), run in CI |
 | `.github/workflows/ci.yml` | CI/CD: lint, tests and dbt parse on every push, deployment to Azure from `main` |
@@ -235,10 +235,12 @@ Workspace `ws-swiss-mobility` (Fabric trial capacity):
 |---|---|
 | `lh_mobility` (Lakehouse) | bronze as Delta tables: `transport_stationboard`, `ingestion_log`, `oracle_stations`, `oracle_cantons` |
 | shortcut `Files/bronze` | link to the ADLS container `bronze` (no copy); connection as an organizational account with **Storage Blob Data Reader** on the container only |
-| `nb_load_bronze` (notebook, hourly) | reads the Parquet through the shortcut and rewrites the Delta tables (full reload, `mergeSchema` for older files); source in `fabric/nb_load_bronze.py` |
+| `nb_load_bronze` (notebook, hourly) | reads the Parquet through the shortcut and rewrites the Delta tables (full reload, `mergeSchema` for older files) |
 | `wh_mobility` (Warehouse) | silver and gold, built by dbt; reads the Lakehouse tables with cross-database queries (`lh_mobility.dbo.…`) |
 
 Bronze files are plain Parquet, so they are loaded by the notebook rather than exposed directly as tables (a table shortcut requires Delta, and shortcut file transformations were not available in the tenant).
+
+The workspace is connected to this repository with **Fabric Git integration** (branch `main`, folder `fabric/workspace`): every item is versioned as text (`notebook-content.py`, `shortcuts.metadata.json`, the Warehouse as an SQL project). Changes made in Fabric are committed from the workspace's Source control panel. The Warehouse objects are created by dbt, which remains their source of truth: their Git copy is a snapshot, and "Update from Git" is not used for them. The GitHub connection uses a fine-grained token limited to this repository (Contents read and write, 90 days).
 
 ### Transformation with dbt
 
