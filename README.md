@@ -176,16 +176,38 @@ Deployment: automatic from GitHub Actions, see [CI/CD](#cicd).
 
 ### Monitoring and alerting
 
-Every invocation is recorded in Application Insights (table `requests`, one row per run). Two log search alert rules query it and notify the action group `ag-swissmobility-oncall` (email):
+Every stage of the pipeline is watched twice: once for **failures** (a job reports an error) and once for **silence** (nothing new arrives, whatever the cause).
+
+```
+Function (15 min) ──► ADLS bronze ──► notebook (hourly) ──► Lakehouse ──► dbt build (hourly) ──► marts ──► report
+   │                                     │                                  │
+   ├─ run failed       (Azure alert)     ├─ job failed (Activator)          ├─ build or test failed (GitHub)
+   └─ no success 45 min (Azure alert)    │                                  └─ bronze older than 24 h (dbt freshness)
+                                         └──────── also covered by dbt freshness ─────────┘
+```
+
+| Component | What can go wrong | Detected by | Notification | Delay |
+|---|---|---|---|---|
+| Azure Function `ingest_stationboard` / `export_reference` | run ends with an error (more than 50 % of stations failed, storage not writable, no station list, Oracle export failed) | Azure Monitor rule `alert-ingestion-run-failed` | email (action group `ag-swissmobility-oncall`) | about 15 min |
+| Azure Function `ingest_stationboard` | no run at all: Function stopped or disabled, code not loading, timer not firing | Azure Monitor rule `alert-ingestion-heartbeat` (no success in 45 min) | email | 45 to 60 min |
+| Single station | API error for one station | ingestion log (`status = failed`) | none: reviewed in the data | — |
+| Fabric notebook `nb_load_bronze` | run fails | Activator `act_monitoring`, rule on `ItemJobFailed` job events | email | minutes |
+| dbt (`dbt-build.yml`) | a model fails to build or a test fails | GitHub Actions run fails | GitHub email | at the next hourly run |
+| Whole chain up to the Lakehouse | data stops arriving for any reason: Function, ADLS, shortcut, notebook or schedule | `dbt source freshness` after each build (departures: error after 24 h; Oracle snapshot: 72 h) | GitHub email | up to 24 h |
+| Platform | Azure incident in the region (e.g. delayed log ingestion) | Azure Service Health | — | — |
+
+The freshness check is the safety net: it looks at the end of the chain, so it catches failures that produce no error at all.
+
+#### Azure alert rules
+
+Every invocation of the Function is recorded in Application Insights (table `requests`, one row per run). Two log search alert rules query it and notify the action group `ag-swissmobility-oncall` (email):
 
 | Rule | Query | Condition | Detects |
 |---|---|---|---|
-| `alert-ingestion-run-failed` | `requests` where `name == "ingest_stationboard"` and `success == false` | more than 0 rows in 15 min, evaluated every 15 min | a run ended with exit code 1: more than 50 % of stations failed, storage not writable, or no station list |
-| `alert-ingestion-heartbeat` | `requests` where `name == "ingest_stationboard"` and `success == true` | fewer than 1 row in 45 min, evaluated every 15 min | no successful run for three cycles: Function stopped or disabled, code not loading, timer not firing |
+| `alert-ingestion-run-failed` | `requests` where `name in ("ingest_stationboard", "export_reference")` and `success == false` | more than 0 rows in 15 min, evaluated every 15 min | a run ended with an error |
+| `alert-ingestion-heartbeat` | `requests` where `name == "ingest_stationboard"` and `success == true` | fewer than 1 row in 45 min, evaluated every 15 min | no successful run for three cycles |
 
-Both rules have severity 1 and resolve automatically once a run succeeds. The heartbeat window tolerates two missed runs before alerting, to avoid false alarms on a single late start.
-
-Failures of individual stations do not alert: the run still succeeds and the failure is recorded in the ingestion log (`status = failed`, with the error message), to be reviewed in the data.
+Both rules have severity 1 and resolve automatically once a run succeeds. The heartbeat window tolerates two missed runs before alerting, to avoid false alarms on a single late start. The daily reference export is covered by the failure rule and by the 72-hour freshness check, not by the heartbeat.
 
 Run history over the last hours:
 
@@ -197,7 +219,16 @@ requests
 | order by timestamp desc
 ```
 
-Both rules were tested. A run was failed on purpose with an invalid `ORACLE_TARGET`: `alert-ingestion-run-failed` fired 6 minutes later and resolved after the next successful run. The Function was then disabled to simulate a silent stop: `alert-ingestion-heartbeat` fired and the email was delivered. The email address of an action group must be verified before notifications are delivered.
+#### Tests of the alerts
+
+| Alert | Test | Result |
+|---|---|---|
+| `alert-ingestion-run-failed` | one run with an invalid `ORACLE_TARGET` | fired 6 minutes later, resolved after the next successful run |
+| `alert-ingestion-heartbeat` | Function disabled for an hour | fired, email delivered |
+| Activator `act_monitoring` | notebook run with a dataset folder that does not exist | email delivered |
+| real incident | the API was unreachable for a few minutes at night (24 and 25 October): 12 of 16 stations failed | `alert-ingestion-run-failed` fired |
+
+The email address of an action group must be verified before notifications are delivered.
 
 ### CI/CD
 
