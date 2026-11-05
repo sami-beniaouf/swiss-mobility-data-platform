@@ -42,11 +42,11 @@
                       "Entity": "fct_departures"
                     }
                   },
-                  "Property": "Punctuality rate"
+                  "Property": "Departure punctuality rate"
                 }
               },
-              "queryRef": "fct_departures.Punctuality rate",
-              "nativeQueryRef": "Punctuality rate",
+              "queryRef": "fct_departures.Departure punctuality rate",
+              "nativeQueryRef": "Departure punctuality rate",
               "format": "0.00 %;-0.00 %;0.00 %"
             }
           ]
@@ -106,6 +106,19 @@
             }
           }
         }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "drillFilterOtherVisuals": true
@@ -135,7 +148,7 @@
                 "Entity": "fct_departures"
               }
             },
-            "Property": "Punctuality rate"
+            "Property": "Departure punctuality rate"
           }
         },
         "type": "Advanced"

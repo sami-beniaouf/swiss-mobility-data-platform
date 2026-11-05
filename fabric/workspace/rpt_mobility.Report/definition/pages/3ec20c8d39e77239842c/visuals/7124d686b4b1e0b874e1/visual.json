@@ -60,11 +60,11 @@
                       "Entity": "fct_departures"
                     }
                   },
-                  "Property": "Punctuality rate"
+                  "Property": "Departure punctuality rate"
                 }
               },
-              "queryRef": "fct_departures.Punctuality rate",
-              "nativeQueryRef": "Punctuality rate"
+              "queryRef": "fct_departures.Departure punctuality rate",
+              "nativeQueryRef": "Departure punctuality rate"
             },
             {
               "field": {
@@ -244,7 +244,7 @@
                               "Entity": "fct_departures"
                             }
                           },
-                          "Property": "Punctuality rate"
+                          "Property": "Departure punctuality rate"
                         }
                       },
                       "FillRule": {
@@ -406,7 +406,7 @@
                 "Entity": "fct_departures"
               }
             },
-            "Property": "Punctuality rate"
+            "Property": "Departure punctuality rate"
           }
         },
         "type": "Advanced"

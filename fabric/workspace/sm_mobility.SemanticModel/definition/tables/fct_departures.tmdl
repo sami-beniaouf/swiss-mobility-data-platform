@@ -20,13 +20,19 @@ table fct_departures
 
 		changedProperty = Name
 
-	measure 'Punctuality rate' = DIVIDE ( [Punctual departures], [Departures with real-time] )
+	/// Share of departures with real-time data that left less than 3 minutes late (measured at departure)
+	measure 'Departure punctuality rate' = DIVIDE ( [Punctual departures], [Departures with real-time] )
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: 95c4b7d6-db33-4ed6-bafd-cd7a4497aaaa
 
 		changedProperty = Name
 
 		changedProperty = FormatString
+
+	/// Share of departures with real-time data that left 3 minutes late or more
+	measure 'Late departure rate' = DIVIDE ( [Departures with real-time] - [Punctual departures], [Departures with real-time] )
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 2f3a6991-c328-4e8d-aa47-017a68743dd8
 
 	measure 'Real-time coverage' = DIVIDE ( [Departures with real-time], [Departures] )
 		formatString: 0.0%;-0.0%;0.0%

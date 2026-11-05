@@ -42,11 +42,11 @@
                       "Entity": "fct_departures"
                     }
                   },
-                  "Property": "Punctuality rate"
+                  "Property": "Late departure rate"
                 }
               },
-              "queryRef": "fct_departures.Punctuality rate",
-              "nativeQueryRef": "Punctuality rate"
+              "queryRef": "fct_departures.Late departure rate",
+              "nativeQueryRef": "Late departure rate"
             }
           ]
         }
@@ -61,10 +61,10 @@
                     "Entity": "fct_departures"
                   }
                 },
-                "Property": "Punctuality rate"
+                "Property": "Late departure rate"
               }
             },
-            "direction": "Ascending"
+            "direction": "Descending"
           }
         ],
         "isDefaultSort": false
@@ -92,7 +92,20 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Stations ranked by punctuality (least punctual first)'"
+                  "Value": "'Share of late departures by station (3 min or more)'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "subTitle": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
                 }
               }
             }
