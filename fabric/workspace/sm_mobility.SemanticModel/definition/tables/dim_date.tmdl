@@ -1,0 +1,103 @@
+table dim_date
+	lineageTag: 452be13e-c430-43b4-a342-637eb5710585
+	sourceLineageTag: [marts].[dim_date]
+	dataCategory: Time
+
+	column date_key
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: b169ad67-18ac-40a8-a05f-73a821d2c3f2
+		sourceLineageTag: date_key
+		summarizeBy: none
+		sourceColumn: date_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column calendar_date
+		dataType: dateTime
+		isKey
+		formatString: General Date
+		sourceProviderType: date
+		lineageTag: 32c62a58-b7ee-4a53-a65b-787f1fb717e5
+		sourceLineageTag: calendar_date
+		summarizeBy: none
+		sourceColumn: calendar_date
+
+		annotation SummarizationSetBy = Automatic
+
+	column year
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 2c6bd02b-f19d-443a-bda5-8d753e906815
+		sourceLineageTag: year
+		summarizeBy: none
+		sourceColumn: year
+
+		annotation SummarizationSetBy = Automatic
+
+	column month
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 6179658f-2330-4487-9bb4-a82ae4cb6bba
+		sourceLineageTag: month
+		summarizeBy: none
+		sourceColumn: month
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_of_month
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: c9f7bd5b-7626-4097-b33d-f09270697f6d
+		sourceLineageTag: day_of_month
+		summarizeBy: none
+		sourceColumn: day_of_month
+
+		annotation SummarizationSetBy = Automatic
+
+	column iso_week
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 1c2d665f-12b9-49f8-8402-3e80215c07ae
+		sourceLineageTag: iso_week
+		summarizeBy: none
+		sourceColumn: iso_week
+
+		annotation SummarizationSetBy = Automatic
+
+	column iso_weekday
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 095ae26b-a342-459f-b01f-288c734267b8
+		sourceLineageTag: iso_weekday
+		summarizeBy: none
+		sourceColumn: iso_weekday
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_weekend
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 5f21af12-82fb-4c98-ab09-e66bb15c549f
+		sourceLineageTag: is_weekend
+		summarizeBy: none
+		sourceColumn: is_weekend
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_date = entity
+		mode: directLake
+		source
+			entityName: dim_date
+			schemaName: marts
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

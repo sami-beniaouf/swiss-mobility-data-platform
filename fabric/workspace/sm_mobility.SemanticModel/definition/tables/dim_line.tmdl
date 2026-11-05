@@ -1,0 +1,63 @@
+table dim_line
+	lineageTag: 255144cf-3ba2-4ba0-8641-7935a5b1ad94
+	sourceLineageTag: [marts].[dim_line]
+
+	column line_key
+		dataType: string
+		sourceProviderType: varchar(32)
+		lineageTag: 43f66839-a1f6-4b5d-8f01-e16b60769168
+		sourceLineageTag: line_key
+		summarizeBy: none
+		sourceColumn: line_key
+
+		annotation SummarizationSetBy = Automatic
+
+	column category
+		dataType: string
+		sourceProviderType: varchar(80)
+		lineageTag: 65397677-fe1a-4f00-9c6e-c8bf3b625c3a
+		sourceLineageTag: category
+		summarizeBy: none
+		sourceColumn: category
+
+		annotation SummarizationSetBy = Automatic
+
+	column line_number
+		dataType: string
+		sourceProviderType: varchar(20)
+		lineageTag: 7b27b7b8-6c62-4a51-9d81-5dd39b871c0f
+		sourceLineageTag: line_number
+		summarizeBy: none
+		sourceColumn: line_number
+
+		annotation SummarizationSetBy = Automatic
+
+	column operator
+		dataType: string
+		sourceProviderType: varchar(50)
+		lineageTag: 3ab9b7ef-c322-419b-aa8f-70eda5d495e7
+		sourceLineageTag: operator
+		summarizeBy: none
+		sourceColumn: operator
+
+		annotation SummarizationSetBy = Automatic
+
+	column transport_mode
+		dataType: string
+		sourceProviderType: varchar(20)
+		lineageTag: 7445804c-0d16-4836-a005-f34423e7ff26
+		sourceLineageTag: transport_mode
+		summarizeBy: none
+		sourceColumn: transport_mode
+
+		annotation SummarizationSetBy = Automatic
+
+	partition dim_line = entity
+		mode: directLake
+		source
+			entityName: dim_line
+			schemaName: marts
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

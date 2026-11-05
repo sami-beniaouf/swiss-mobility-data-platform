@@ -1,0 +1,130 @@
+table dim_station
+	lineageTag: 6dbba9fd-babf-487e-96a1-2eec21ab1f49
+	sourceLineageTag: [marts].[dim_station]
+
+	column station_id
+		dataType: string
+		sourceProviderType: varchar(20)
+		lineageTag: f8f9e5ba-6947-48e3-ae5a-19a751b1b26a
+		sourceLineageTag: station_id
+		summarizeBy: none
+		sourceColumn: station_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column station_name
+		dataType: string
+		sourceProviderType: varchar(200)
+		lineageTag: e4712376-5c14-4f9e-90bc-76586863a9c7
+		sourceLineageTag: station_name
+		summarizeBy: none
+		sourceColumn: station_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column municipality_bfs_nr
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: f740ab8b-a2ad-46f5-bd0e-45f2f6e2137e
+		sourceLineageTag: municipality_bfs_nr
+		summarizeBy: none
+		sourceColumn: municipality_bfs_nr
+
+		annotation SummarizationSetBy = Automatic
+
+	column canton_code
+		dataType: string
+		sourceProviderType: varchar(16)
+		lineageTag: b89809f8-3653-4a35-b419-01f19b1c3abb
+		sourceLineageTag: canton_code
+		summarizeBy: none
+		sourceColumn: canton_code
+
+		annotation SummarizationSetBy = Automatic
+
+	column canton_name
+		dataType: string
+		sourceProviderType: varchar(100)
+		lineageTag: f4c118ff-b04d-47a3-a328-0156372ce975
+		sourceLineageTag: canton_name
+		summarizeBy: none
+		sourceColumn: canton_name
+
+		annotation SummarizationSetBy = Automatic
+
+	column language_region
+		dataType: string
+		sourceProviderType: varchar(20)
+		lineageTag: de842bf9-51a6-4552-a617-531a0c263241
+		sourceLineageTag: language_region
+		summarizeBy: none
+		sourceColumn: language_region
+
+		annotation SummarizationSetBy = Automatic
+
+	column lv95_e
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		sourceProviderType: decimal(10, 2)
+		lineageTag: 4e2faac4-f0cd-4462-8bfb-65bbf3acff60
+		sourceLineageTag: lv95_e
+		summarizeBy: none
+		sourceColumn: lv95_e
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column lv95_n
+		dataType: decimal
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		sourceProviderType: decimal(10, 2)
+		lineageTag: 60764784-fe38-460e-ac3e-caac7bab7c13
+		sourceLineageTag: lv95_n
+		summarizeBy: none
+		sourceColumn: lv95_n
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"currencyCulture":"en-US"}
+
+	column latitude
+		dataType: double
+		sourceProviderType: decimal(9, 6)
+		lineageTag: a588c516-f77a-4163-8400-7c7b33f3dc25
+		sourceLineageTag: latitude
+		dataCategory: Latitude
+		summarizeBy: none
+		sourceColumn: latitude
+
+		changedProperty = DataCategory
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column longitude
+		dataType: double
+		sourceProviderType: decimal(9, 6)
+		lineageTag: 9a6ce96c-b209-43e1-b0af-52f02dcbf200
+		sourceLineageTag: longitude
+		dataCategory: Longitude
+		summarizeBy: none
+		sourceColumn: longitude
+
+		changedProperty = DataCategory
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition dim_station = entity
+		mode: directLake
+		source
+			entityName: dim_station
+			schemaName: marts
+			expressionSource: DatabaseQuery
+
+	annotation PBI_ResultType = Table
+

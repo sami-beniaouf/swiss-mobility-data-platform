@@ -6,7 +6,9 @@ CREATE TABLE [marts].[dim_station] (
     [canton_name]         VARCHAR (100)   NULL,
     [language_region]     VARCHAR (20)    NULL,
     [lv95_e]              DECIMAL (10, 2) NULL,
-    [lv95_n]              DECIMAL (10, 2) NULL
+    [lv95_n]              DECIMAL (10, 2) NULL,
+    [latitude]            DECIMAL (9, 6)  NULL,
+    [longitude]           DECIMAL (9, 6)  NULL
 );
 
 

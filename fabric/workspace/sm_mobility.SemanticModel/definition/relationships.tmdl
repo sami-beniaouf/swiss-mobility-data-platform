@@ -1,0 +1,12 @@
+relationship f9083361-c048-67bb-3ac0-dc1295c114f0
+	fromColumn: fct_departures.station_id
+	toColumn: dim_station.station_id
+
+relationship 86a7a4d9-2d25-ee0e-d4d0-3290376eabd0
+	fromColumn: fct_departures.line_key
+	toColumn: dim_line.line_key
+
+relationship 06b2eb28-4132-6111-747f-dcda74a79fd1
+	fromColumn: fct_departures.date_key
+	toColumn: dim_date.date_key
+

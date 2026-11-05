@@ -1,0 +1,199 @@
+table fct_departures
+	lineageTag: 0e8d6d80-ce67-4da9-a1df-aca410eb018f
+	sourceLineageTag: [marts].[fct_departures]
+
+	measure Departures = COUNTROWS ( fct_departures )
+		formatString: 0
+		lineageTag: 786fd1eb-22ff-4937-a44a-13541434d4d2
+
+		changedProperty = Name
+
+	measure 'Departures with real-time' = SUM ( fct_departures[has_realtime] )
+		formatString: 0
+		lineageTag: 212913a5-cd18-4365-a13e-aa4e72c0c8fe
+
+		changedProperty = Name
+
+	measure 'Punctual departures' = SUM ( fct_departures[is_punctual] )
+		formatString: 0
+		lineageTag: dcd8216f-0dfd-4df3-ab75-860e75ef0aba
+
+		changedProperty = Name
+
+	measure 'Punctuality rate' = DIVIDE ( [Punctual departures], [Departures with real-time] )
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 95c4b7d6-db33-4ed6-bafd-cd7a4497aaaa
+
+		changedProperty = Name
+
+		changedProperty = FormatString
+
+	measure 'Real-time coverage' = DIVIDE ( [Departures with real-time], [Departures] )
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: a7a1f81e-14ec-4637-b29d-4cce331b1010
+
+		changedProperty = Name
+
+		changedProperty = FormatString
+
+	measure 'Average delay (min)' = AVERAGE ( fct_departures[delay_min] )
+		lineageTag: c294b1b1-4e8f-4548-8977-64ad5597d278
+
+		changedProperty = Name
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column departure_id
+		dataType: string
+		sourceProviderType: varchar(32)
+		lineageTag: 03f2db5e-629e-45a5-a416-a9ad7fd4629a
+		sourceLineageTag: departure_id
+		summarizeBy: none
+		sourceColumn: departure_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column station_id
+		dataType: string
+		isHidden
+		sourceProviderType: varchar(20)
+		lineageTag: f67f1b9a-aa3e-4ffc-bae3-78ca8ab676d0
+		sourceLineageTag: station_id
+		summarizeBy: none
+		sourceColumn: station_id
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column line_key
+		dataType: string
+		isHidden
+		sourceProviderType: varchar(32)
+		lineageTag: d08e8429-7b36-41a7-a301-b36bdd9b0ad9
+		sourceLineageTag: line_key
+		summarizeBy: none
+		sourceColumn: line_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column date_key
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: f99eae8c-53d3-4661-9a3c-22b506c5050e
+		sourceLineageTag: date_key
+		summarizeBy: none
+		sourceColumn: date_key
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column departure_planned_local
+		dataType: dateTime
+		formatString: General Date
+		sourceProviderType: datetime2
+		lineageTag: e9df6624-fcf5-4b71-95d4-80b616d1d4ce
+		sourceLineageTag: departure_planned_local
+		summarizeBy: none
+		sourceColumn: departure_planned_local
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column departure_hour_local
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: d38c09f3-170b-4c44-aac4-6edb4ea37220
+		sourceLineageTag: departure_hour_local
+		summarizeBy: sum
+		sourceColumn: departure_hour_local
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column destination
+		dataType: string
+		sourceProviderType: varchar(200)
+		lineageTag: 9bc09ee8-37c5-45e8-91e4-e2277b3903b4
+		sourceLineageTag: destination
+		summarizeBy: none
+		sourceColumn: destination
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column platform
+		dataType: string
+		sourceProviderType: varchar(10)
+		lineageTag: 41659625-9236-4dc0-bee7-70876839a584
+		sourceLineageTag: platform
+		summarizeBy: none
+		sourceColumn: platform
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column delay_min
+		dataType: int64
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 103ed26f-9dff-492f-ab75-8be122904dbd
+		sourceLineageTag: delay_min
+		summarizeBy: sum
+		sourceColumn: delay_min
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column has_realtime
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 3e544333-9480-4f3d-bdbd-ea9afa995d93
+		sourceLineageTag: has_realtime
+		summarizeBy: sum
+		sourceColumn: has_realtime
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column is_punctual
+		dataType: int64
+		isHidden
+		formatString: 0
+		sourceProviderType: int
+		lineageTag: 06be3ce9-dbd4-4fe5-9648-ed76a282ef5c
+		sourceLineageTag: is_punctual
+		summarizeBy: sum
+		sourceColumn: is_punctual
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition fct_departures = entity
+		mode: directLake
+		source
+			entityName: fct_departures
+			schemaName: marts
+			expressionSource: DatabaseQuery
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+

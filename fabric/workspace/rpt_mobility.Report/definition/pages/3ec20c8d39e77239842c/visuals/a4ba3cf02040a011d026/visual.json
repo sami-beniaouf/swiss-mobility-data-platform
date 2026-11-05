@@ -1,0 +1,158 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "a4ba3cf02040a011d026",
+  "position": {
+    "x": 1188.864,
+    "y": 16,
+    "z": 0,
+    "height": 148,
+    "width": 716,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "cardVisual",
+    "query": {
+      "queryState": {
+        "Data": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fct_departures"
+                    }
+                  },
+                  "Property": "Punctuality rate"
+                }
+              },
+              "queryRef": "fct_departures.Punctuality rate",
+              "nativeQueryRef": "Punctuality rate"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fct_departures"
+                    }
+                  },
+                  "Property": "Average delay (min)"
+                }
+              },
+              "queryRef": "fct_departures.Average delay (min)",
+              "nativeQueryRef": "Average delay (min)"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fct_departures"
+                    }
+                  },
+                  "Property": "Departures"
+                }
+              },
+              "queryRef": "fct_departures.Departures",
+              "nativeQueryRef": "Departures"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "fct_departures"
+                    }
+                  },
+                  "Property": "Real-time coverage"
+                }
+              },
+              "queryRef": "fct_departures.Real-time coverage",
+              "nativeQueryRef": "Real-time coverage"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Measure": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "fct_departures"
+                  }
+                },
+                "Property": "Punctuality rate"
+              }
+            },
+            "direction": "Descending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "7c1319db4cde700780a0",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_departures"
+              }
+            },
+            "Property": "Punctuality rate"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "4c621e85ed0878b88e60",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_departures"
+              }
+            },
+            "Property": "Average delay (min)"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "38303f29dea3021b2726",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_departures"
+              }
+            },
+            "Property": "Departures"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "689f67dd343315015d0d",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_departures"
+              }
+            },
+            "Property": "Real-time coverage"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
+  }
+}
