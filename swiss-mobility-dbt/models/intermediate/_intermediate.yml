@@ -2,7 +2,7 @@ version: 2
 
 models:
   - name: int_departures__enriched
-    description: Departures with transport mode, local date/hour and punctuality flags.
+    description: Departures that have taken place (actual departure before the latest poll), with transport mode, local date/hour and punctuality flags.
     columns:
       - name: departure_id
         tests: [unique, not_null]

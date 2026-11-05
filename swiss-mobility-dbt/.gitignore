@@ -7,3 +7,6 @@ __pycache__/
 
 # CI profile with a placeholder server, used by dbt parse in GitHub Actions
 !ci/profiles.yml
+
+# dbt anonymous usage id
+.user.yml

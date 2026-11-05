@@ -4,7 +4,7 @@ End-to-end data platform on **Microsoft Fabric** using Swiss public transport op
 Oracle data hub + REST APIs → Fabric Lakehouse → dbt (Fabric Warehouse) → Power BI,
 including a Tableau → Power BI report migration.
 
-> Status: ingestion running in Azure every 15 minutes (Oracle Cloud hub → ADLS bronze), with failure and heartbeat alerts. Fabric layer in progress.
+> Status: ingestion running in Azure every 15 minutes (Oracle Cloud hub → ADLS bronze) with failure and heartbeat alerts; bronze loaded hourly into a Fabric Lakehouse; silver and gold built by dbt in a Fabric Warehouse (30 tests passing). Power BI report in progress.
 
 ## Architecture
 
@@ -36,7 +36,8 @@ including a Tableau → Power BI report migration.
 | `scripts/check_setup.py` | Smoke test of the local stack |
 | `src/ingestion/` | Ingestion job: stations from Oracle → stationboard API → bronze Parquet |
 | `src/function_app.py`, `src/host.json`, `src/requirements.txt` | Azure Function wrapper (deployment root: `src/`) |
-| `notebooks/` | Exploration and design of the ingestion (API structure, retry policy, station loading) |
+| `notebooks/` | Exploration and design: API structure, retry policy, station loading, polling coverage (01-04), bronze profiling (05), reference data check against swissBOUNDARIES3D (06) |
+| `fabric/` | Source of the Fabric notebook that loads bronze into Delta tables |
 | `swiss-mobility-dbt/` | dbt project (staging / intermediate / marts + tests) |
 | `tests/` | Unit tests of the ingestion (pytest), run in CI |
 | `.github/workflows/ci.yml` | CI/CD: lint and tests on every push, deployment to Azure from `main` |
@@ -225,14 +226,52 @@ docker compose exec toolbox ruff check src tests
 docker compose exec toolbox python -m pytest
 ```
 
-### Connecting dbt to Fabric (once the Fabric workspace exists)
+### Fabric: Lakehouse and Warehouse
 
-```bash
-# inside the toolbox
-az login --use-device-code
-cp swiss-mobility-dbt/profiles_example.yml swiss-mobility-dbt/profiles.yml   # fill in the SQL endpoint
-cd swiss-mobility-dbt && dbt debug
+Workspace `ws-swiss-mobility` (Fabric trial capacity):
+
+| Item | Role |
+|---|---|
+| `lh_mobility` (Lakehouse) | bronze as Delta tables: `transport_stationboard`, `ingestion_log`, `oracle_stations`, `oracle_cantons` |
+| shortcut `Files/bronze` | link to the ADLS container `bronze` (no copy); connection as an organizational account with **Storage Blob Data Reader** on the container only |
+| `nb_load_bronze` (notebook, hourly) | reads the Parquet through the shortcut and rewrites the Delta tables (full reload, `mergeSchema` for older files); source in `fabric/nb_load_bronze.py` |
+| `wh_mobility` (Warehouse) | silver and gold, built by dbt; reads the Lakehouse tables with cross-database queries (`lh_mobility.dbo.…`) |
+
+Bronze files are plain Parquet, so they are loaded by the notebook rather than exposed directly as tables (a table shortcut requires Delta, and shortcut file transformations were not available in the tenant).
+
+### Transformation with dbt
+
 ```
+lh_mobility (bronze)            wh_mobility
+  transport_stationboard ──►  staging       stg_transport__departures      view
+  oracle_stations        ──►                stg_oracle__stations           view
+  oracle_cantons         ──►                stg_oracle__cantons            view
+                              intermediate  int_departures__enriched       view
+                              marts         dim_date, dim_station,         tables
+                                            dim_line, fct_departures
+                              reference     transport_categories (seed)    table
+```
+
+| Layer | Models | Rules |
+|---|---|---|
+| staging (silver) | one model per source table: types, trimming, deduplication | departures: one row per `station + category + line + scheduled time + destination`, latest poll kept; within a poll, the copy with a known delay wins. Reference tables: latest daily snapshot (`max(_batch_id)`) |
+| intermediate (silver) | `int_departures__enriched` | only departures that have taken place (planned time + last known delay before the latest poll); transport mode from the seed; local date and hour; `is_punctual` = delay < `punctuality_threshold_min` (3 min), null when no real-time data |
+| marts (gold) | star schema | `fct_departures` (grain: one scheduled departure at one station) with `dim_station` (stations with canton and language region), `dim_line` (category + line + operator), `dim_date` (calendar) |
+
+Punctuality KPI: `SUM(is_punctual) / SUM(has_realtime)`, reported with the real-time coverage (`SUM(has_realtime) / COUNT(*)`).
+
+Tests (`dbt test`, 30): `unique` and `not_null` on every key, `relationships` between facts, dimensions, sources and the seed, `accepted_values` on flags and language regions, and the singular test `assert_delay_within_bounds` (0 to 300 minutes, bounds taken from the profiling).
+
+**Connection.** dbt connects from the toolbox as the service principal `sp-swissmobility-dbt` (Contributor on the workspace; tenant setting "Service principals can use Fabric APIs" enabled). `profiles.yml` (git-ignored, copied from `profiles_example.yml`) uses `authentication: token_credential` with `azure.identity.ClientSecretCredential`: the token is acquired by azure-identity and passed to the driver. `ActiveDirectoryServicePrincipal` is not used because dbt-fabric 1.11 sends an `Authority Id` keyword its driver rejects. Credentials come from `.env` (`AZURE_TENANT_ID`, `DBT_CLIENT_ID`, `DBT_CLIENT_SECRET`).
+
+```powershell
+docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt debug    # configuration and connection
+docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt seed     # transport_categories
+docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt run      # all models, in dependency order
+docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt test     # 30 tests
+```
+
+`dbt run --select staging` builds one layer only. The CI parses the project on every push (`dbt parse`, no connection).
 
 ## Data sources
 
@@ -248,4 +287,5 @@ Established by profiling the bronze data (`notebooks/05_bronze_profiling.ipynb`)
 | The stationboard API has no cancellation information | cancelled departures cannot be identified | punctuality covers departures that ran with real-time data |
 | Real-time coverage varies by category (S, IR, IC, RE, R: 85-94 %; ICE 45 %; night S-Bahn 32 %) | punctuality of low-coverage categories rests on few departures | reports show the coverage (`has_realtime`) next to the punctuality rate |
 | A few cross-border departures have two train numbers (e.g. IR 36 / ICE 109 from Basel, 0.07 % of departures) | counted as two departures | accepted |
+| The delay of a departure is the last value seen before it leaves, at most 15 minutes earlier (polling interval) | a delay that grows in the last minutes is not captured | accepted; punctuality is measured on the last known delay |
 | The API is unreachable for a few minutes most nights | the stations polled during the outage have no departures in that batch; departures are still captured by the following polls | failed station calls are recorded in the ingestion log; the run fails and alerts above 50 % |

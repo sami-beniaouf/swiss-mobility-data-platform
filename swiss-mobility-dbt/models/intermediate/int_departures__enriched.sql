@@ -1,10 +1,23 @@
--- Departures enriched with mode and punctuality flags.
+-- Departures that have taken place, enriched with mode and punctuality flags.
 -- Punctuality rule follows the Swiss convention: a departure counts as punctual
 -- when it leaves less than var('punctuality_threshold_min') minutes late.
+--
+-- Each poll also returns departures still in the future, whose delay is only a forecast
+-- (mostly 0 or unknown). A departure is kept once its actual departure time (planned time
+-- plus the last known delay) is before the latest poll; later runs add it once it has left.
 
-with departures as (
+with all_departures as (
 
     select * from {{ ref('stg_transport__departures') }}
+
+),
+
+departures as (
+
+    select *
+    from all_departures
+    where dateadd(minute, coalesce(delay_min, 0), departure_planned_utc)
+          < (select max(ingested_at_utc) from all_departures)
 
 ),
 
