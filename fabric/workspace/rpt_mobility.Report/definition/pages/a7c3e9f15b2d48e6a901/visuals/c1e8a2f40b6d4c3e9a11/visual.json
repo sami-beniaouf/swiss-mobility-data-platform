@@ -30,7 +30,7 @@
               {
                 "textRuns": [
                   {
-                    "value": "Share of departures leaving 3 minutes late or more · local time · delay measured up to 15 minutes before departure",
+                    "value": "Share of departures leaving 3 minutes late or more · local time · delay measured up to 15 minutes before departure · hours with fewer than 30 trains are left empty",
                     "textStyle": {
                       "fontSize": "12pt",
                       "color": "#999999"

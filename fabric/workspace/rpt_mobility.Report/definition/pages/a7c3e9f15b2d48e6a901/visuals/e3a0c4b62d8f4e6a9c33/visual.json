@@ -60,11 +60,11 @@
                       "Entity": "fct_departures"
                     }
                   },
-                  "Property": "Late departure rate"
+                  "Property": "Late departure rate (min. 30 trains)"
                 }
               },
-              "queryRef": "fct_departures.Late departure rate",
-              "nativeQueryRef": "Late departure rate"
+              "queryRef": "fct_departures.Late departure rate (min. 30 trains)",
+              "nativeQueryRef": "Late departure rate (min. 30 trains)"
             }
           ]
         }

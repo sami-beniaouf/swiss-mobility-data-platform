@@ -29,6 +29,12 @@ table fct_departures
 
 		changedProperty = FormatString
 
+	/// Late departure rate, left empty when fewer than 30 departures with real-time data
+	/// support it (small samples, e.g. night hours, swing with every single late train)
+	measure 'Late departure rate (min. 30 trains)' = IF ( [Departures with real-time] >= 30, [Late departure rate] )
+		formatString: 0.0%;-0.0%;0.0%
+		lineageTag: 14768b56-57bc-469c-b2df-fe16e714ac8e
+
 	measure 'Real-time coverage' = DIVIDE ( [Departures with real-time], [Departures] )
 		formatString: 0.0%;-0.0%;0.0%
 		lineageTag: a7a1f81e-14ec-4637-b29d-4cce331b1010
