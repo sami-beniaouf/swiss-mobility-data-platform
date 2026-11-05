@@ -1,0 +1,68 @@
+name: dbt build
+
+# Builds and tests silver and gold in the Fabric Warehouse, every hour and on demand.
+# Runs after the hourly Fabric notebook that loads bronze into the Lakehouse.
+on:
+  schedule:
+    - cron: "20 * * * *"         # minute 20 of every hour, UTC (GitHub may start it a few minutes late)
+  workflow_dispatch:              # manual run from the Actions tab
+
+permissions:
+  contents: read
+  id-token: write                 # OIDC token for azure/login
+
+concurrency:
+  group: dbt-build-prod           # never two builds on the Warehouse at the same time
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: dbt build (prod)
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: swiss-mobility-dbt
+    env:
+      DBT_PROFILES_DIR: ci
+      FABRIC_SQL_SERVER: ${{ secrets.FABRIC_SQL_SERVER }}
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+
+      - name: Set up Python 3.13
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+          cache: pip
+          cache-dependency-path: swiss-mobility-dbt/ci/requirements.txt
+
+      - name: Install dbt
+        run: pip install -r ci/requirements.txt
+
+      # Workload identity federation: sp-swissmobility-dbt trusts GitHub tokens for this
+      # repository and branch main. It has no Azure subscription role, only access to the
+      # Fabric workspace, hence allow-no-subscriptions.
+      - name: Log in to Azure
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_DBT_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          allow-no-subscriptions: true
+
+      # seed + run + test in dependency order: a failing test stops the models built on it.
+      - name: dbt build
+        run: dbt build --target prod
+
+      - name: Keep the run artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: dbt-artifacts
+          path: |
+            swiss-mobility-dbt/target/run_results.json
+            swiss-mobility-dbt/logs/dbt.log
+          retention-days: 14
+          if-no-files-found: ignore

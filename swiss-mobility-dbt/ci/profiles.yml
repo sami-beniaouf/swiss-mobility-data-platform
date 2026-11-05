@@ -1,5 +1,10 @@
-# Profile used in CI for `dbt parse` only: dbt needs a profile to load the project,
-# but parsing never connects to the Warehouse. The server name is a placeholder.
+# Profiles used by GitHub Actions. No credential is stored here.
+#
+# ci    `dbt parse` on every push: dbt needs a profile to load the project, but parsing
+#       never connects to the Warehouse, so the server name is a placeholder.
+# prod  Scheduled `dbt build`: azure/login signs in with OIDC (sp-swissmobility-dbt,
+#       federated credential for branch main, no secret) and dbt reuses that Azure CLI
+#       session. The server name comes from the repository secret FABRIC_SQL_SERVER.
 swiss_mobility:
   target: ci
   outputs:
@@ -12,3 +17,13 @@ swiss_mobility:
       schema: dbo
       authentication: CLI
       threads: 1
+
+    prod:
+      type: fabric
+      driver: "ODBC Driver 18 for SQL Server"
+      server: "{{ env_var('FABRIC_SQL_SERVER', 'unset.datawarehouse.fabric.microsoft.com') }}"
+      port: 1433
+      database: wh_mobility
+      schema: dbo
+      authentication: CLI
+      threads: 4
