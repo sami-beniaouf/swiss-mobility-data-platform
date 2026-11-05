@@ -1,6 +1,7 @@
 name: dbt build
 
-# Builds and tests silver and gold in the Fabric Warehouse, every hour and on demand.
+# Builds and tests silver and gold in the Fabric Warehouse, every hour and on demand,
+# then checks that the bronze data is fresh.
 # Runs after the hourly Fabric notebook that loads bronze into the Lakehouse.
 on:
   schedule:
@@ -56,6 +57,13 @@ jobs:
       - name: dbt build
         run: dbt build --target prod
 
+      # Fails when the newest bronze row is older than error_after in _sources.yml
+      # (transport: 24 h, Oracle snapshot: 72 h). Checks the end of the chain: Function,
+      # ADLS, shortcut and the Fabric notebook must all have worked for the data to be fresh.
+      - name: Check source freshness
+        if: always()
+        run: dbt source freshness --target prod
+
       - name: Keep the run artifacts
         if: always()
         uses: actions/upload-artifact@v4
@@ -63,6 +71,7 @@ jobs:
           name: dbt-artifacts
           path: |
             swiss-mobility-dbt/target/run_results.json
+            swiss-mobility-dbt/target/sources.json
             swiss-mobility-dbt/logs/dbt.log
           retention-days: 14
           if-no-files-found: ignore
