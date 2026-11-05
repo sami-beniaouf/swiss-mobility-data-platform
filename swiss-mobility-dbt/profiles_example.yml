@@ -1,8 +1,10 @@
-# Copy to ~/.dbt/profiles.yml (never commit the real one).
-# Prerequisites:
-#   pip install dbt-fabric
-#   Microsoft ODBC Driver 18 for SQL Server
-#   az login   (for authentication: CLI)
+# Copy to swiss-mobility-dbt/profiles.yml (git-ignored): DBT_PROFILES_DIR points to this folder.
+# Server: Fabric > wh_mobility > Settings > SQL connection string.
+#
+# dev   Development from the toolbox, as the service principal sp-swissmobility-dbt
+#       (Contributor on the workspace). Credentials come from .env, never from this file.
+# prod  Scheduled runs from GitHub Actions: azure/login signs in with OIDC (no secret),
+#       dbt reuses that Azure CLI session.
 
 swiss_mobility:
   target: dev
@@ -10,22 +12,27 @@ swiss_mobility:
     dev:
       type: fabric
       driver: "ODBC Driver 18 for SQL Server"
-      server: "<your-workspace-sql-endpoint>.datawarehouse.fabric.microsoft.com"
+      server: "<sql-connection-string>.datawarehouse.fabric.microsoft.com"
       port: 1433
-      database: wh_mobility        # Fabric Warehouse (dev workspace)
+      database: wh_mobility
       schema: dbo
-      authentication: CLI
+      # The adapter acquires the token with azure-identity and passes it to the driver.
+      # (ActiveDirectoryServicePrincipal sends an "Authority Id" keyword that the
+      # driver used by dbt-fabric 1.11 rejects.)
+      authentication: token_credential
+      credential_class: azure.identity.ClientSecretCredential
+      credential_kwargs:
+        tenant_id: "{{ env_var('AZURE_TENANT_ID') }}"
+        client_id: "{{ env_var('DBT_CLIENT_ID') }}"
+        client_secret: "{{ env_var('DBT_CLIENT_SECRET') }}"
       threads: 4
 
     prod:
       type: fabric
       driver: "ODBC Driver 18 for SQL Server"
-      server: "<prod-workspace-sql-endpoint>.datawarehouse.fabric.microsoft.com"
+      server: "<sql-connection-string>.datawarehouse.fabric.microsoft.com"
       port: 1433
       database: wh_mobility
       schema: dbo
-      authentication: ServicePrincipal
-      tenant_id: "{{ env_var('AZURE_TENANT_ID') }}"
-      client_id: "{{ env_var('AZURE_CLIENT_ID') }}"
-      client_secret: "{{ env_var('AZURE_CLIENT_SECRET') }}"
+      authentication: CLI
       threads: 4
