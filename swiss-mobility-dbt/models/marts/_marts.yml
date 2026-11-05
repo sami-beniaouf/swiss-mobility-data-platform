@@ -9,10 +9,16 @@ models:
         tests: [unique, not_null]
 
   - name: dim_station
-    description: Stations from the Oracle hub with canton attributes and LV95 coordinates.
+    description: Stations from the Oracle hub with canton attributes, LV95 coordinates and WGS84 latitude/longitude.
     columns:
       - name: station_id
         tests: [unique, not_null]
+      - name: latitude
+        description: WGS84 latitude converted from LV95 (swisstopo approximate formulas, about 1 m)
+        tests: [not_null]
+      - name: longitude
+        description: WGS84 longitude converted from LV95 (swisstopo approximate formulas, about 1 m)
+        tests: [not_null]
 
   - name: dim_line
     description: One row per category + line number + operator.
