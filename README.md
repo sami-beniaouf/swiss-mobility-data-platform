@@ -4,7 +4,7 @@ End-to-end data platform on **Microsoft Fabric** using Swiss public transport op
 Oracle data hub + REST APIs → Fabric Lakehouse → dbt (Fabric Warehouse) → Power BI,
 including a Tableau → Power BI report migration.
 
-> Status: ingestion running in Azure every 15 minutes (Oracle Cloud hub → ADLS bronze) with failure and heartbeat alerts; bronze loaded hourly into a Fabric Lakehouse; silver and gold built by dbt in a Fabric Warehouse (30 tests passing). Power BI report in progress.
+> Status: ingestion running in Azure every 15 minutes (Oracle Cloud hub → ADLS bronze) with failure and heartbeat alerts; bronze loaded hourly into a Fabric Lakehouse; silver and gold built and tested by dbt in a Fabric Warehouse every hour from GitHub Actions. Power BI report in progress.
 
 ## Architecture
 
@@ -40,7 +40,8 @@ including a Tableau → Power BI report migration.
 | `fabric/` | Source of the Fabric notebook that loads bronze into Delta tables |
 | `swiss-mobility-dbt/` | dbt project (staging / intermediate / marts + tests) |
 | `tests/` | Unit tests of the ingestion (pytest), run in CI |
-| `.github/workflows/ci.yml` | CI/CD: lint and tests on every push, deployment to Azure from `main` |
+| `.github/workflows/ci.yml` | CI/CD: lint, tests and dbt parse on every push, deployment to Azure from `main` |
+| `.github/workflows/dbt-build.yml` | hourly `dbt build` on the Fabric Warehouse |
 
 ## Local setup (Windows)
 
@@ -272,6 +273,13 @@ docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt test     # 30 t
 ```
 
 `dbt run --select staging` builds one layer only. The CI parses the project on every push (`dbt parse`, no connection).
+
+**Production runs.** `.github/workflows/dbt-build.yml` runs `dbt build --target prod` (seed, models and tests in dependency order) every hour at minute 20 UTC, after the bronze notebook, and on demand from the Actions tab. It signs in as the same identity `sp-swissmobility-dbt`, but with workload identity federation instead of a secret: a federated credential trusts GitHub tokens for this repository and branch `main` only (subject `repo:sami-beniaouf@<owner id>/swiss-mobility-data-platform@<repo id>:ref:refs/heads/main`), and dbt reuses the Azure CLI session (`authentication: CLI`, profile `ci/profiles.yml`). The Warehouse address comes from the repository secret `FABRIC_SQL_SERVER`. `run_results.json` and `dbt.log` are kept as run artifacts for 14 days; a failed scheduled run is reported by GitHub by email.
+
+| Identity | Used by | Authentication |
+|---|---|---|
+| `sp-swissmobility-dbt` | dbt from the toolbox | client secret in `.env` |
+| `sp-swissmobility-dbt` | scheduled dbt build | OIDC, no secret |
 
 ## Data sources
 
