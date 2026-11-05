@@ -7,6 +7,14 @@ models:
       - name: date_key
         description: yyyymmdd integer, joins to fct_departures.date_key
         tests: [unique, not_null]
+      - name: weekday_name
+        description: Monday to Sunday, sorted by iso_weekday in the semantic model
+        tests: [not_null]
+      - name: day_type
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['Weekday', 'Weekend']
 
   - name: dim_station
     description: Stations from the Oracle hub with canton attributes, LV95 coordinates and WGS84 latitude/longitude.

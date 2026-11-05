@@ -92,6 +92,27 @@ table dim_date
 
 		annotation SummarizationSetBy = Automatic
 
+	column weekday_name
+		dataType: string
+		sourceProviderType: varchar
+		lineageTag: 64377fa5-e466-4c34-9c28-b0a8ead8795c
+		sourceLineageTag: weekday_name
+		summarizeBy: none
+		sourceColumn: weekday_name
+		sortByColumn: iso_weekday
+
+		annotation SummarizationSetBy = Automatic
+
+	column day_type
+		dataType: string
+		sourceProviderType: varchar
+		lineageTag: eca1c986-d197-4257-bd70-03c4d3bbf5e3
+		sourceLineageTag: day_type
+		summarizeBy: none
+		sourceColumn: day_type
+
+		annotation SummarizationSetBy = Automatic
+
 	partition dim_date = entity
 		mode: directLake
 		source

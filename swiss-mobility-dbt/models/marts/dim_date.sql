@@ -37,5 +37,19 @@ select
     case
         when (datediff(day, cast('1900-01-01' as date), calendar_date) % 7) >= 5 then 1
         else 0
-    end                                                         as is_weekend
+    end                                                         as is_weekend,
+    -- Names written out instead of datename(): independent of the server language
+    case (datediff(day, cast('1900-01-01' as date), calendar_date) % 7) + 1
+        when 1 then 'Monday'
+        when 2 then 'Tuesday'
+        when 3 then 'Wednesday'
+        when 4 then 'Thursday'
+        when 5 then 'Friday'
+        when 6 then 'Saturday'
+        else 'Sunday'
+    end                                                         as weekday_name,
+    case
+        when (datediff(day, cast('1900-01-01' as date), calendar_date) % 7) >= 5 then 'Weekend'
+        else 'Weekday'
+    end                                                         as day_type
 from dates

@@ -120,7 +120,7 @@ table fct_departures
 		sourceProviderType: int
 		lineageTag: d38c09f3-170b-4c44-aac4-6edb4ea37220
 		sourceLineageTag: departure_hour_local
-		summarizeBy: sum
+		summarizeBy: none
 		sourceColumn: departure_hour_local
 
 		changedProperty = IsHidden
