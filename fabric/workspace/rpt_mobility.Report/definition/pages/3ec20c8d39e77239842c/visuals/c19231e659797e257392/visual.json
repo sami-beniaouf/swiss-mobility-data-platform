@@ -42,12 +42,11 @@
                       "Entity": "fct_departures"
                     }
                   },
-                  "Property": "Departure punctuality rate"
+                  "Property": "On-time departures"
                 }
               },
-              "queryRef": "fct_departures.Departure punctuality rate",
-              "nativeQueryRef": "Departure punctuality rate",
-              "format": "0.00 %;-0.00 %;0.00 %"
+              "queryRef": "fct_departures.On-time departures",
+              "nativeQueryRef": "On-time departures"
             }
           ]
         }
@@ -138,20 +137,6 @@
           }
         },
         "type": "Categorical"
-      },
-      {
-        "name": "34e3b9c1d63785020017",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fct_departures"
-              }
-            },
-            "Property": "Departure punctuality rate"
-          }
-        },
-        "type": "Advanced"
       }
     ]
   }

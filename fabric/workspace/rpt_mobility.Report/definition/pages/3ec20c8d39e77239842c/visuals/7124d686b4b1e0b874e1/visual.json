@@ -60,11 +60,11 @@
                       "Entity": "fct_departures"
                     }
                   },
-                  "Property": "Departure punctuality rate"
+                  "Property": "On-time departures"
                 }
               },
-              "queryRef": "fct_departures.Departure punctuality rate",
-              "nativeQueryRef": "Departure punctuality rate"
+              "queryRef": "fct_departures.On-time departures",
+              "nativeQueryRef": "On-time departures"
             },
             {
               "field": {
@@ -121,61 +121,6 @@
       }
     },
     "objects": {
-      "mapControls": [
-        {
-          "properties": {
-            "defaultStyle": {
-              "expr": {
-                "Literal": {
-                  "Value": "'road'"
-                }
-              }
-            },
-            "showStylePicker": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            },
-            "showNavigationControls": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            },
-            "showSelectionControl": {
-              "expr": {
-                "Literal": {
-                  "Value": "false"
-                }
-              }
-            },
-            "zoom": {
-              "expr": {
-                "Literal": {
-                  "Value": "7.78D"
-                }
-              }
-            },
-            "centerLatitude": {
-              "expr": {
-                "Literal": {
-                  "Value": "46.78196611460848D"
-                }
-              }
-            },
-            "centerLongitude": {
-              "expr": {
-                "Literal": {
-                  "Value": "7.835671999999931D"
-                }
-              }
-            }
-          }
-        }
-      ],
       "bubbleLayer": [
         {
           "properties": {
@@ -244,7 +189,7 @@
                               "Entity": "fct_departures"
                             }
                           },
-                          "Property": "Departure punctuality rate"
+                          "Property": "On-time departures"
                         }
                       },
                       "FillRule": {
@@ -288,6 +233,40 @@
             ]
           }
         }
+      ],
+      "mapControls": [
+        {
+          "properties": {
+            "zoom": {
+              "expr": {
+                "Literal": {
+                  "Value": "7.78D"
+                }
+              }
+            },
+            "centerLatitude": {
+              "expr": {
+                "Literal": {
+                  "Value": "46.78196611460848D"
+                }
+              }
+            },
+            "centerLongitude": {
+              "expr": {
+                "Literal": {
+                  "Value": "7.835671999999931D"
+                }
+              }
+            },
+            "defaultStyle": {
+              "expr": {
+                "Literal": {
+                  "Value": "'road'"
+                }
+              }
+            }
+          }
+        }
       ]
     },
     "visualContainerObjects": {
@@ -311,6 +290,19 @@
               "expr": {
                 "Literal": {
                   "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "background": [
+        {
+          "properties": {
+            "transparency": {
+              "expr": {
+                "Literal": {
+                  "Value": "0D"
                 }
               }
             }
@@ -393,20 +385,6 @@
               }
             },
             "Property": "Average delay (min)"
-          }
-        },
-        "type": "Advanced"
-      },
-      {
-        "name": "1aafb119da5de2a93307",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fct_departures"
-              }
-            },
-            "Property": "Departure punctuality rate"
           }
         },
         "type": "Advanced"

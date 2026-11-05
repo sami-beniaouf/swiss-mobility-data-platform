@@ -2,11 +2,11 @@
   "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
   "name": "a4ba3cf02040a011d026",
   "position": {
-    "x": 1188.864,
-    "y": 16,
+    "x": 1171.0751034890598,
+    "y": 16.350088704908337,
     "z": 0,
-    "height": 148,
-    "width": 716,
+    "height": 147.15079834417506,
+    "width": 733.71023063276175,
     "tabOrder": 0
   },
   "visual": {
@@ -23,11 +23,11 @@
                       "Entity": "fct_departures"
                     }
                   },
-                  "Property": "Departure punctuality rate"
+                  "Property": "On-time departures"
                 }
               },
-              "queryRef": "fct_departures.Departure punctuality rate",
-              "nativeQueryRef": "Departure punctuality rate"
+              "queryRef": "fct_departures.On-time departures",
+              "nativeQueryRef": "On-time departures"
             },
             {
               "field": {
@@ -84,7 +84,7 @@
                     "Entity": "fct_departures"
                   }
                 },
-                "Property": "Departure punctuality rate"
+                "Property": "On-time departures"
               }
             },
             "direction": "Descending"
@@ -97,20 +97,6 @@
   },
   "filterConfig": {
     "filters": [
-      {
-        "name": "7c1319db4cde700780a0",
-        "field": {
-          "Measure": {
-            "Expression": {
-              "SourceRef": {
-                "Entity": "fct_departures"
-              }
-            },
-            "Property": "Departure punctuality rate"
-          }
-        },
-        "type": "Advanced"
-      },
       {
         "name": "4c621e85ed0878b88e60",
         "field": {
