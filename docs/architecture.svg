@@ -1,0 +1,83 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="684" viewBox="0 0 1240 684" role="img" aria-label="Architecture of the Swiss Mobility Data Platform">
+<defs><marker id="a" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#667085"/></marker></defs>
+<rect width="1240" height="684" fill="#ffffff"/>
+<rect x="210" y="70" width="404" height="350" rx="16" fill="#f5f9ff" stroke="#9cc3ec" stroke-width="1.2"/>
+<text x="222" y="408" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#0b5cad" text-anchor="start">Azure</text>
+<rect x="626" y="70" width="404" height="350" rx="16" fill="#f4fbf7" stroke="#9fd3b8" stroke-width="1.2"/>
+<text x="638" y="408" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#11724f" text-anchor="start">Microsoft Fabric</text>
+<text x="100.0" y="52" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#475467" text-anchor="middle">SOURCES</text>
+<text x="308.0" y="52" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#475467" text-anchor="middle">1 · COLLECT</text>
+<text x="516.0" y="52" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#475467" text-anchor="middle">2 · STORE RAW</text>
+<text x="724.0" y="52" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#475467" text-anchor="middle">3 · LOAD</text>
+<text x="932.0" y="52" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#475467" text-anchor="middle">4 · TRANSFORM</text>
+<text x="1140.0" y="52" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#475467" text-anchor="middle">5 · USE</text>
+<rect x="16" y="96" width="168" height="120" rx="12" fill="#f2f4f7" stroke="#98a2b3" stroke-width="1.5"/>
+<text x="100.0" y="140.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13.5" font-weight="bold" fill="#1d2939" text-anchor="middle">transport.opendata.ch</text>
+<text x="100.0" y="162.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">Departures API</text>
+<text x="100.0" y="180.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">real-time delays</text>
+<rect x="16" y="244" width="168" height="120" rx="12" fill="#f2f4f7" stroke="#98a2b3" stroke-width="1.5"/>
+<text x="100.0" y="279.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Oracle</text>
+<text x="100.0" y="298.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Autonomous DB</text>
+<text x="100.0" y="320.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">Reference data:</text>
+<text x="100.0" y="338.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">stations, cantons</text>
+<rect x="224" y="114.0" width="168" height="132" rx="12" fill="#e8f1fc" stroke="#2e7bcf" stroke-width="1.5"/>
+<text x="308.0" y="155.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Azure Function</text>
+<text x="308.0" y="177.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">Collects departures</text>
+<text x="308.0" y="195.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">every 15 min · Python</text>
+<text x="308.0" y="213.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">writes Parquet files</text>
+<rect x="432" y="114.0" width="168" height="132" rx="12" fill="#e8f1fc" stroke="#2e7bcf" stroke-width="1.5"/>
+<text x="516.0" y="164.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">ADLS Gen2</text>
+<text x="516.0" y="186.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">Raw data, unchanged</text>
+<text x="516.0" y="204.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">bronze · Parquet</text>
+<rect x="640" y="114.0" width="168" height="132" rx="12" fill="#e7f6ee" stroke="#23935f" stroke-width="1.5"/>
+<text x="724.0" y="155.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Fabric Lakehouse</text>
+<text x="724.0" y="177.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">Reads ADLS through a</text>
+<text x="724.0" y="195.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">OneLake shortcut, loads</text>
+<text x="724.0" y="213.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">Delta tables · hourly</text>
+<rect x="848" y="114.0" width="168" height="132" rx="12" fill="#e7f6ee" stroke="#23935f" stroke-width="1.5"/>
+<text x="932.0" y="155.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Fabric Warehouse</text>
+<text x="932.0" y="177.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">dbt, hourly: clean,</text>
+<text x="932.0" y="195.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">model and test</text>
+<text x="932.0" y="213.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">silver → gold</text>
+<rect x="848" y="290" width="168" height="100" rx="12" fill="#e7f6ee" stroke="#23935f" stroke-width="1.5"/>
+<text x="932.0" y="324.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Semantic model</text>
+<text x="932.0" y="346.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">Direct Lake, refreshed</text>
+<text x="932.0" y="364.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">after each dbt build</text>
+<rect x="1056" y="96" width="168" height="120" rx="12" fill="#fff5e5" stroke="#d98a12" stroke-width="1.5"/>
+<text x="1140.0" y="140.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">QGIS</text>
+<text x="1140.0" y="162.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">Station map from a</text>
+<text x="1140.0" y="180.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">GeoPackage export</text>
+<rect x="1056" y="284" width="168" height="112" rx="12" fill="#fff5e5" stroke="#d98a12" stroke-width="1.5"/>
+<text x="1140.0" y="324.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Power BI</text>
+<text x="1140.0" y="346.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">4-page report:</text>
+<text x="1140.0" y="364.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">punctuality, data quality</text>
+<polyline points="184,156 204,156 204,166 220,166" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<polyline points="184,304 204,304 204,194 220,194" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<polyline points="392,180 428,180" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<polyline points="600,180 636,180" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<polyline points="808,180 844,180" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<polyline points="1016,180 1036,180 1036,156 1052,156" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<polyline points="932.0,246 932.0,286" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<polyline points="1016,340 1052,340" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<text x="16" y="470" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="13" font-weight="bold" fill="#475467" text-anchor="start">ACROSS THE PIPELINE</text>
+<rect x="16.0" y="488" width="284.0" height="104" rx="12" fill="#e8f1fc" stroke="#2e7bcf" stroke-width="1.5"/>
+<text x="158.0" y="522" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Security</text>
+<text x="158.0" y="546" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">Key Vault, managed identities,</text>
+<text x="158.0" y="565" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">GitHub OIDC: no secret in code</text>
+<rect x="324.0" y="488" width="284.0" height="104" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
+<text x="466.0" y="522" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Automation</text>
+<text x="466.0" y="546" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">GitHub Actions: tests and deploy</text>
+<text x="466.0" y="565" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">on push, dbt build every hour</text>
+<rect x="632.0" y="488" width="284.0" height="104" rx="12" fill="#e8f1fc" stroke="#2e7bcf" stroke-width="1.5"/>
+<text x="774.0" y="522" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Monitoring</text>
+<text x="774.0" y="546" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">Alerts on failed or missing runs:</text>
+<text x="774.0" y="565" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">Azure Monitor, Fabric Activator</text>
+<rect x="940.0" y="488" width="284.0" height="104" rx="12" fill="#e7f6ee" stroke="#23935f" stroke-width="1.5"/>
+<text x="1082.0" y="522" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Data quality</text>
+<text x="1082.0" y="546" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">dbt tests at every build, source</text>
+<text x="1082.0" y="565" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">freshness, quality page in Power BI</text>
+<line x1="16" y1="634" x2="1224" y2="634" stroke="#eaecf0" stroke-width="1.5"/>
+<polyline points="16,656 50,656" stroke="#667085" stroke-width="2" marker-end="url(#a)"/>
+<text x="60" y="660" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">data flow</text>
+<text x="156" y="660" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">Bronze: raw data  ·  Silver: cleaned and deduplicated  ·  Gold: star schema for reporting</text>
+</svg>

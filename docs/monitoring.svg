@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="502" viewBox="0 0 1240 502" role="img" aria-label="Monitoring and alerting of the Swiss Mobility Data Platform">
+<defs><marker id="a" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#667085"/></marker><marker id="ad64545" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#d64545"/></marker></defs>
+<rect width="1240" height="502" fill="#ffffff"/>
+<rect x="16.0" y="16.0" width="168.0" height="88.0" rx="12" fill="#e8f1fc" stroke="#2e7bcf" stroke-width="1.5"/>
+<text x="100.0" y="44.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Azure Function</text>
+<text x="100.0" y="66.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">collects departures</text>
+<text x="100.0" y="84.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">every 15 min</text>
+<polyline points="184.0,60.0 220.0,60.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<rect x="224.0" y="16.0" width="168.0" height="88.0" rx="12" fill="#e8f1fc" stroke="#2e7bcf" stroke-width="1.5"/>
+<text x="308.0" y="53.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">ADLS Gen2</text>
+<text x="308.0" y="75.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">bronze Parquet files</text>
+<polyline points="392.0,60.0 428.0,60.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<rect x="432.0" y="16.0" width="168.0" height="88.0" rx="12" fill="#e7f6ee" stroke="#23935f" stroke-width="1.5"/>
+<text x="516.0" y="44.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Fabric notebook</text>
+<text x="516.0" y="66.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">loads bronze tables</text>
+<text x="516.0" y="84.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">every hour</text>
+<polyline points="600.0,60.0 636.0,60.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<rect x="640.0" y="16.0" width="168.0" height="88.0" rx="12" fill="#e7f6ee" stroke="#23935f" stroke-width="1.5"/>
+<text x="724.0" y="53.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Fabric Lakehouse</text>
+<text x="724.0" y="75.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">bronze Delta tables</text>
+<polyline points="808.0,60.0 844.0,60.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<rect x="848.0" y="16.0" width="168.0" height="88.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
+<text x="932.0" y="44.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">dbt build</text>
+<text x="932.0" y="66.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">GitHub Actions, hourly:</text>
+<text x="932.0" y="84.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">build, test, refresh</text>
+<polyline points="1016.0,60.0 1052.0,60.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a)" stroke-linejoin="round"/>
+<rect x="1056.0" y="16.0" width="168.0" height="88.0" rx="12" fill="#fff5e5" stroke="#d98a12" stroke-width="1.5"/>
+<text x="1140.0" y="53.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Power BI report</text>
+<text x="1140.0" y="75.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">Direct Lake model</text>
+<text x="1056.0" y="218.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#b42318" text-anchor="start">FAILURE</text>
+<text x="1056.0" y="238.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#b42318" text-anchor="start">a job reports an error</text>
+<rect x="16.0" y="168.0" width="168.0" height="112.0" rx="12" fill="#fdecec" stroke="#d64545" stroke-width="1.5"/>
+<text x="100.0" y="199.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Run failed</text>
+<text x="100.0" y="221.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">Azure Monitor rule</text>
+<text x="100.0" y="239.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">alert-ingestion-run-failed</text>
+<text x="100.0" y="257.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">email within ~15 min</text>
+<rect x="432.0" y="168.0" width="168.0" height="112.0" rx="12" fill="#fdecec" stroke="#d64545" stroke-width="1.5"/>
+<text x="516.0" y="199.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Notebook failed</text>
+<text x="516.0" y="221.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">Fabric Activator</text>
+<text x="516.0" y="239.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">act_monitoring, ItemJobFailed</text>
+<text x="516.0" y="257.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">email within minutes</text>
+<rect x="848.0" y="168.0" width="168.0" height="112.0" rx="12" fill="#fdecec" stroke="#d64545" stroke-width="1.5"/>
+<text x="932.0" y="199.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Workflow failed</text>
+<text x="932.0" y="221.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">model, test or model</text>
+<text x="932.0" y="239.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">refresh fails in GitHub</text>
+<text x="932.0" y="257.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">email at the hourly run</text>
+<polyline points="100.0,166.0 100.0,108.0" fill="none" stroke="#d64545" stroke-width="2" marker-end="url(#ad64545)" stroke-linejoin="round"/>
+<polyline points="516.0,166.0 516.0,108.0" fill="none" stroke="#d64545" stroke-width="2" marker-end="url(#ad64545)" stroke-linejoin="round"/>
+<polyline points="932.0,166.0 932.0,108.0" fill="none" stroke="#d64545" stroke-width="2" marker-end="url(#ad64545)" stroke-linejoin="round"/>
+<rect x="16.0" y="318.0" width="168.0" height="112.0" rx="12" fill="#fff6e0" stroke="#c98a00" stroke-width="1.5"/>
+<text x="100.0" y="349.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Function silent</text>
+<text x="100.0" y="371.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">Azure Monitor rule</text>
+<text x="100.0" y="389.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">alert-ingestion-heartbeat</text>
+<text x="100.0" y="407.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">no successful run in 45 min</text>
+<rect x="224.0" y="318.0" width="792.0" height="112.0" rx="12" fill="#fff6e0" stroke="#c98a00" stroke-width="1.5"/>
+<text x="620.0" y="358.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">dbt source freshness, after every build</text>
+<text x="620.0" y="380.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">error when the newest bronze departure is older than 24 h (reference data: 72 h)</text>
+<text x="620.0" y="398.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">safety net for the whole chain up to the Lakehouse: Function, ADLS, shortcut, notebook, schedule</text>
+<text x="1056.0" y="368.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#93370d" text-anchor="start">SILENCE</text>
+<text x="1056.0" y="388.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#93370d" text-anchor="start">nothing new arrives,</text>
+<text x="1056.0" y="406.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#93370d" text-anchor="start">whatever the cause</text>
+<line x1="16" y1="458" x2="1224" y2="458" stroke="#eaecf0" stroke-width="1.5"/>
+<text x="16.0" y="486.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">Every alert ends in an email: Azure action group ag-swissmobility-oncall, Activator, GitHub notification of a failed run. Each alert was tested by forcing the failure.</text>
+</svg>

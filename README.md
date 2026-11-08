@@ -8,7 +8,7 @@ Cloud data platform on Azure and **Microsoft Fabric** that measures the punctual
 |---|---|
 | Collection | every **15 minutes**, **16 main stations**, unattended in Azure |
 | Volume | about **100,000 departures** every two weeks (7,600 per weekday) |
-| Result | **98.1 %** of departures on time over 26 October – 8 November 2026, with **94.4 %** real-time coverage ([findings](#findings)) |
+| Result | **98.1 %** of departures with real-time data classified as on time over 26 October – 8 November 2026, based on the last delay published before departure; real-time coverage **94.4 %** ([findings](#findings)) |
 
 ![Overview page of the Power BI report](docs/powerbi_overview.png)
 
@@ -23,29 +23,13 @@ Cloud data platform on Azure and **Microsoft Fabric** that measures the punctual
 
 ## Architecture
 
-```
- Oracle Autonomous DB            transport.opendata.ch (REST)
- stations, cantons                     departures
-        │                                  │
-        └──────────────┬───────────────────┘
-                       │  Azure Function (timer, every 15 min)
-                       │  secrets from Key Vault, managed identity
-                       ▼
-        ADLS Gen2 stswissmobility: bronze (Parquet, partitioned by ingestion day)
-                       │  OneLake shortcut
-                       ▼
- Fabric Lakehouse ──► dbt-fabric: staging → intermediate → marts (star schema)
-                       │
-                       ▼
-               Power BI (Direct Lake)
-               QGIS (GeoPackage export of the marts)
-```
+![Architecture: sources, Azure ingestion, ADLS bronze, Fabric Lakehouse and Warehouse, Power BI and QGIS](docs/architecture.svg)
 
 ## Findings
 
 Period 26 October – 8 November 2026, 16 main stations, about 100,000 scheduled departures. A departure is late when it leaves 3 minutes or more after the timetable; the delay is the last value published before departure (see [Known limitations](#known-limitations)).
 
-- **Punctuality is high: 98.1 % of departures with real-time data leave on time**, with an average delay of 0.3 minutes. Real-time data covers 94.4 % of departures. The daily rate stays between 97.2 % and 99.0 %; the lowest days are 3 and 4 November.
+- **Punctuality is high: 98.1 % of departures with real-time data are classified as on time** (last delay published before departure under 3 minutes), with an average delay of 0.3 minutes. Real-time data covers 94.4 % of departures. The daily rate stays between 97.2 % and 99.0 %; the lowest days are 3 and 4 November.
 - **Late departures are concentrated in a few stations.** Lugano (4.9 %), Sion (3.9 %) and Lausanne (3.8 %) have the highest shares; Luzern (0.4 %), La Chaux-de-Fonds (0.7 %) and Bern (0.9 %) the lowest. By language region: Italian 4.9 %, French 2.7 %, German 1.5 %. The Italian-speaking region is represented by Lugano alone.
 
 ![When are trains late?](docs/powerbi_when.png)
@@ -218,13 +202,7 @@ Deployment: automatic from GitHub Actions, see [CI/CD](#cicd).
 
 Every stage of the pipeline is watched twice: once for **failures** (a job reports an error) and once for **silence** (nothing new arrives, whatever the cause).
 
-```
-Function (15 min) ──► ADLS bronze ──► notebook (hourly) ──► Lakehouse ──► dbt build (hourly) ──► marts ──► report
-   │                                     │                                  │
-   ├─ run failed       (Azure alert)     ├─ job failed (Activator)          ├─ build or test failed (GitHub)
-   └─ no success 45 min (Azure alert)    │                                  └─ bronze older than 24 h (dbt freshness)
-                                         └──────── also covered by dbt freshness ─────────┘
-```
+![Monitoring and alerting: failure and silence detection at each stage](docs/monitoring.svg)
 
 | Component | What can go wrong | Detected by | Notification | Delay |
 |---|---|---|---|---|
@@ -272,20 +250,15 @@ The email address of an action group must be verified before notifications are d
 
 ### CI/CD
 
-`.github/workflows/ci.yml` runs on GitHub Actions:
+Two GitHub Actions workflows, plus the Git integration of the Fabric workspace:
 
-```
-push (any branch) / pull request to main
-   └── test:   ruff check src tests  →  pytest (40 tests, no network, no secret)
-                  │ green, and push to main only
-                  ▼
-           deploy: azure/login (OIDC)  →  Azure/functions-action, package src/, remote build
-```
+![CI/CD: ci.yml on every push, dbt-build.yml every hour, Fabric Git integration](docs/cicd.svg)
 
 | Job | Runs on | Purpose |
 |---|---|---|
 | `test` | every push and pull request | lint, then the unit tests against the Function's own dependencies (`tests/requirements.txt` includes `src/requirements.txt`) |
-| `deploy` | push to `main`, only if `test` passed | replaces the code of `func-swissmobility-sb`; one deployment at a time |
+| `dbt` | every push and pull request | `dbt parse`: the dbt project compiles, without connecting to the Warehouse |
+| `deploy` | push to `main`, only if `test` and `dbt` passed | replaces the code of `func-swissmobility-sb`; one deployment at a time |
 
 The deploy job authenticates with **workload identity federation**: no secret is stored. The app registration `sp-swissmobility-github` trusts GitHub tokens for `repo:sami-beniaouf/swiss-mobility-data-platform`, branch `main` only, and has the role **Website Contributor** on the Function App only. The repository secrets `AZURE_CLIENT_ID`, `AZURE_TENANT_ID` and `AZURE_SUBSCRIPTION_ID` hold identifiers, not credentials; they are stored as secrets to keep them out of public logs.
 
@@ -391,7 +364,7 @@ Established by profiling the bronze data (`notebooks/05_bronze_profiling.ipynb`)
 | Limitation | Effect | Handling |
 |---|---|---|
 | The stationboard API has no cancellation information | cancelled departures cannot be identified | punctuality covers departures that ran with real-time data |
-| Real-time coverage varies by category (S, IR, IC, RE, R: 85-94 %; ICE 45 %; night S-Bahn 32 %) | punctuality of low-coverage categories rests on few departures | reports show the coverage (`has_realtime`) next to the punctuality rate |
+| Real-time coverage varies by category: lowest for ICE (53 %) and EuroCity (89 %), 93-98 % for the other categories (departed trains, 26 October – 8 November 2026, see the Data quality page) | punctuality of low-coverage categories rests on few departures | reports show the coverage (`has_realtime`) next to the punctuality rate |
 | A few cross-border departures have two train numbers (e.g. IR 36 / ICE 109 from Basel, 0.07 % of departures) | counted as two departures | accepted |
 | The delay of a departure is the last value seen before it leaves, at most 15 minutes earlier (polling interval) | a delay that grows in the last minutes is not captured | accepted; punctuality is measured on the last known delay |
 | The API is unreachable for a few minutes most nights | the stations polled during the outage have no departures in that batch; departures are still captured by the following polls | failed station calls are recorded in the ingestion log; the run fails and alerts above 50 % |
