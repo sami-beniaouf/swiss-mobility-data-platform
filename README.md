@@ -45,7 +45,7 @@ including a Tableau → Power BI report migration.
 | `swiss-mobility-dbt/` | dbt project (staging / intermediate / marts + tests) |
 | `tests/` | Unit tests of the ingestion (pytest), run in CI |
 | `.github/workflows/ci.yml` | CI/CD: lint, tests and dbt parse on every push, deployment to Azure from `main` |
-| `.github/workflows/dbt-build.yml` | hourly `dbt build` on the Fabric Warehouse |
+| `.github/workflows/dbt-build.yml` | hourly `dbt build` on the Fabric Warehouse, then refresh of the Power BI semantic model |
 
 ## Local setup (Windows)
 
@@ -311,7 +311,7 @@ docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt test     # 30 t
 
 `dbt run --select staging` builds one layer only. The CI parses the project on every push (`dbt parse`, no connection).
 
-**Production runs.** `.github/workflows/dbt-build.yml` runs `dbt build --target prod` (seed, models and tests in dependency order) every hour at minute 20 UTC, after the bronze notebook, and on demand from the Actions tab. It signs in as the same identity `sp-swissmobility-dbt`, but with workload identity federation instead of a secret: a federated credential trusts GitHub tokens for this repository and branch `main` only (subject `repo:sami-beniaouf@<owner id>/swiss-mobility-data-platform@<repo id>:ref:refs/heads/main`), and dbt reuses the Azure CLI session (`authentication: CLI`, profile `ci/profiles.yml`). The Warehouse address comes from the repository secret `FABRIC_SQL_SERVER`. `run_results.json` and `dbt.log` are kept as run artifacts for 14 days; a failed scheduled run is reported by GitHub by email.
+**Production runs.** `.github/workflows/dbt-build.yml` runs `dbt build --target prod` (seed, models and tests in dependency order) every hour at minute 20 UTC, after the bronze notebook, and on demand from the Actions tab. It signs in as the same identity `sp-swissmobility-dbt`, but with workload identity federation instead of a secret: a federated credential trusts GitHub tokens for this repository and branch `main` only (subject `repo:sami-beniaouf@<owner id>/swiss-mobility-data-platform@<repo id>:ref:refs/heads/main`), and dbt reuses the Azure CLI session (`authentication: CLI`, profile `ci/profiles.yml`). The Warehouse address comes from the repository secret `FABRIC_SQL_SERVER`. After a successful build, the workflow refreshes the Direct Lake semantic model `sm_mobility` through the Power BI REST API with the same identity: dbt recreates the gold tables, and the model keeps reading the previous Parquet files until it is reframed (automatic Direct Lake updates do not follow dropped and recreated tables). Since the Warehouse publishes the Delta log of a new table to OneLake asynchronously, the refresh starts after 60 seconds and is retried up to 3 times. The workspace and model IDs come from the repository variables `FABRIC_WORKSPACE_ID` and `SEMANTIC_MODEL_ID`. `run_results.json` and `dbt.log` are kept as run artifacts for 14 days; a failed scheduled run is reported by GitHub by email.
 
 | Identity | Used by | Authentication |
 |---|---|---|
