@@ -20,7 +20,7 @@ typed as (
     select
         cast(station_id as varchar(20))                     as station_id,
         upper(trim(cast(category as varchar(10))))          as category,
-        trim(cast(line_number as varchar(20)))              as line_number,
+        trim(cast(line_number as varchar(20)))              as line_number_raw,
         trim(cast(operator as varchar(50)))                 as operator,
         trim(cast(destination as varchar(200)))             as destination,
         cast(departure_planned_utc as datetime2(6))         as departure_planned_utc,
@@ -31,6 +31,20 @@ typed as (
     from source
     where station_id is not null
       and departure_planned_utc is not null
+
+),
+
+-- Train numbers come zero-padded ("000151" for EC 151), line names do not ("8", "S21"):
+-- purely numeric values are stored without leading zeros, other values unchanged.
+cleaned as (
+
+    select
+        *,
+        case
+            when line_number_raw = '' or line_number_raw like '%[^0-9]%' then line_number_raw
+            else cast(cast(line_number_raw as bigint) as varchar(20))
+        end                                                 as line_number
+    from typed
 
 ),
 
@@ -45,7 +59,7 @@ deduplicated as (
                 case when delay_min is not null then 0 else 1 end,
                 case when platform is not null then 0 else 1 end
         ) as poll_rank
-    from typed
+    from cleaned
 
 )
 
