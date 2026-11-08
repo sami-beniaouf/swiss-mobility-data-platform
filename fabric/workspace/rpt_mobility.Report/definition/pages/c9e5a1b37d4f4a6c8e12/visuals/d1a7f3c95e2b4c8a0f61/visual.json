@@ -1,0 +1,48 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.14.0/schema.json",
+  "name": "d1a7f3c95e2b4c8a0f61",
+  "position": {
+    "x": 16,
+    "y": 16,
+    "z": 0,
+    "height": 148,
+    "width": 1156,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Data quality",
+                    "textStyle": {
+                      "fontWeight": "bold",
+                      "fontSize": "28pt"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Completeness and real-time coverage of the ingested departures · real-time coverage: share of departures with a delay published before departure · the current day is incomplete",
+                    "textStyle": {
+                      "fontSize": "14pt",
+                      "color": "#999999"
+                    }
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}
