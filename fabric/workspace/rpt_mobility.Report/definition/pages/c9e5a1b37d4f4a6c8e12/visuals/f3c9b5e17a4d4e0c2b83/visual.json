@@ -76,7 +76,7 @@
             "text": {
               "expr": {
                 "Literal": {
-                  "Value": "'Departures per day (a drop points to an ingestion gap)'"
+                  "Value": "'Departures per day (weekends run fewer trains)'"
                 }
               }
             }

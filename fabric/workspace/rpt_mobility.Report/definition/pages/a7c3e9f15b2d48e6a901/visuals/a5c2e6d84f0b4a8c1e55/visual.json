@@ -240,5 +240,51 @@
       ]
     },
     "drillFilterOtherVisuals": true
+  },
+  "filterConfig": {
+    "filters": [
+      {
+        "name": "76b441a5b4a8171c4301",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_departures"
+              }
+            },
+            "Property": "departure_hour_local"
+          }
+        },
+        "type": "Advanced"
+      },
+      {
+        "name": "2616076743b2889c7cc8",
+        "field": {
+          "Column": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "dim_date"
+              }
+            },
+            "Property": "weekday_name"
+          }
+        },
+        "type": "Categorical"
+      },
+      {
+        "name": "8e4d6bc198b8a81e95e6",
+        "field": {
+          "Measure": {
+            "Expression": {
+              "SourceRef": {
+                "Entity": "fct_departures"
+              }
+            },
+            "Property": "Late departure rate (min. 30 trains)"
+          }
+        },
+        "type": "Advanced"
+      }
+    ]
   }
 }
