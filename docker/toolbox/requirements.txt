@@ -11,6 +11,12 @@ azure-identity==1.26.0          # DefaultAzureCredential: managed identity in Az
 azure-storage-file-datalake==12.26.0
 python-dotenv==1.2.4
 
+# Geospatial export for QGIS (scripts/export_station_map.py)
+geopandas==1.2.0
+shapely==2.2.0
+pyproj==3.8.0
+pyogrio==0.13.0
+
 # Notebooks
 jupyterlab==4.6.4
 
