@@ -59,23 +59,33 @@ jobs:
 
       # dbt rebuilds the gold tables (new Parquet files in OneLake). The Direct Lake model
       # keeps pointing to the previous files until it is refreshed ("reframed"), so it is
-      # refreshed after every successful build. Same identity, Power BI REST API.
+      # refreshed after every successful build. The Warehouse publishes the Delta log of a
+      # rebuilt table to OneLake asynchronously, so a refresh started right after the build
+      # can fail on a table that is not visible yet: wait, and retry up to 3 times.
+      # Same identity as dbt, Power BI REST API.
       - name: Refresh the semantic model
         env:
           REFRESHES_URL: https://api.powerbi.com/v1.0/myorg/groups/${{ vars.FABRIC_WORKSPACE_ID }}/datasets/${{ vars.SEMANTIC_MODEL_ID }}/refreshes
           POWER_BI: https://analysis.windows.net/powerbi/api
         run: |
-          az rest --method post --resource "$POWER_BI" --url "$REFRESHES_URL" \
-            --body '{"notifyOption": "NoNotification"}'
-          for attempt in $(seq 1 30); do
-            sleep 10
-            status=$(az rest --method get --resource "$POWER_BI" --url "$REFRESHES_URL?\$top=1" \
-              --query "value[0].status" --output tsv)
-            echo "Refresh status: $status"
+          latest() {
+            az rest --method get --resource "$POWER_BI" --url "$REFRESHES_URL?\$top=1" \
+              --query "value[0].$1" --output tsv
+          }
+          for refresh in 1 2 3; do
+            sleep 60
+            az rest --method post --resource "$POWER_BI" --url "$REFRESHES_URL" \
+              --body '{"notifyOption": "NoNotification"}'
+            status=Unknown
+            for check in $(seq 1 30); do
+              sleep 10
+              status=$(latest status)
+              if [ "$status" != "Unknown" ]; then break; fi
+            done
+            echo "Refresh $refresh: $status"
             if [ "$status" = "Completed" ]; then exit 0; fi
-            if [ "$status" = "Failed" ]; then exit 1; fi
+            latest serviceExceptionJson
           done
-          echo "Refresh not finished after 5 minutes"
           exit 1
 
       # Fails when the newest bronze row is older than error_after in _sources.yml
