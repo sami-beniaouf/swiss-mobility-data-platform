@@ -23,6 +23,7 @@ including a Tableau → Power BI report migration.
                        │
                        ▼
                Power BI (Direct Lake)
+               QGIS (GeoPackage export of the marts)
 ```
 
 ## Repository layout
@@ -34,6 +35,9 @@ including a Tableau → Power BI report migration.
 | `oracle/sql/` | DDL + reference data for the Oracle hub (26 cantons, 16 stations) |
 | `oracle/init/` | Loads `oracle/sql/*.sql` on the first container start |
 | `scripts/check_setup.py` | Smoke test of the local stack |
+| `scripts/export_station_map.py` | Export of the station punctuality from the Warehouse to a GeoPackage (EPSG:2056) |
+| `gis/` | QGIS project and the script that builds and exports its print layout |
+| `docs/` | Exported map |
 | `src/ingestion/` | Ingestion job: stations from Oracle → stationboard API → bronze Parquet |
 | `src/function_app.py`, `src/host.json`, `src/requirements.txt` | Azure Function wrapper (deployment root: `src/`) |
 | `notebooks/` | Exploration and design: API structure, retry policy, station loading, polling coverage (01-04), bronze profiling (05), reference data check against swissBOUNDARIES3D (06) |
@@ -313,6 +317,31 @@ docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt test     # 30 t
 |---|---|---|
 | `sp-swissmobility-dbt` | dbt from the toolbox | client secret in `.env` |
 | `sp-swissmobility-dbt` | scheduled dbt build | OIDC, no secret |
+
+### Map in QGIS
+
+![Share of late departures by station](docs/station_punctuality_map.png)
+
+The map reads the gold layer of the Warehouse, not a copy of the report data, so it shows the same figures as the Power BI report.
+
+1. `scripts/export_station_map.py` queries `dim_station` and `fct_departures` over the last 14 days (`--days`) as `sp-swissmobility-dbt` and writes one point per station to `data/gis/station_punctuality.gpkg` (Swiss LV95, EPSG:2056): departures, share of late departures, punctuality, real-time coverage, average delay, canton and language region. The rates use the same rules as the semantic model (departed trains with real-time data, 3-minute threshold).
+2. `gis/station_punctuality.qgz` styles the layer: colour by share of late departures (1-point classes), size by number of departures, labels with the station name. It references the GeoPackage by relative path.
+3. `gis/build_print_layout.py`, run from the QGIS Python console, builds the A4 layout and exports `docs/station_punctuality_map.png` at 200 dpi.
+
+```powershell
+docker compose exec toolbox python scripts/export_station_map.py --days 14
+```
+
+```python
+# QGIS Python console, with gis/station_punctuality.qgz open
+exec(open("gis/build_print_layout.py", encoding="utf-8").read())
+```
+
+| Layer | Service | Use |
+|---|---|---|
+| Landeskarten (grau) | swisstopo WMTS | screen |
+| swisstopo national map grey | swisstopo WMS (`wms.geo.admin.ch`) | print: the WMS renders the map scale that fits the export resolution, where the WMTS would switch to a more detailed map at 200 dpi |
+| SITN orthophoto 2016 | SITN WMS (`sitn.ne.ch/ogc-sitn-open/wms`), canton of Neuchâtel | inset Neuchâtel – La Chaux-de-Fonds |
 
 ## Data sources
 
