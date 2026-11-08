@@ -1,10 +1,25 @@
 # Swiss Mobility Data Platform
 
-End-to-end data platform on **Microsoft Fabric** using Swiss public transport open data:
-Oracle data hub + REST APIs → Fabric Lakehouse → dbt (Fabric Warehouse) → Power BI,
-including a Tableau → Power BI report migration.
+Cloud data platform on Azure and **Microsoft Fabric** that measures the punctuality of Swiss trains from public open data, from the API to the report: every 15 minutes, departures are collected, then cleaned, modelled and tested, and published in a Power BI report and a QGIS map.
 
-> Status: ingestion running in Azure every 15 minutes (Oracle Cloud hub → ADLS bronze) with failure and heartbeat alerts; bronze loaded hourly into a Fabric Lakehouse; silver and gold built and tested by dbt in a Fabric Warehouse every hour from GitHub Actions, followed by a refresh of the Power BI report (Direct Lake); station map in QGIS.
+## At a glance
+
+| | |
+|---|---|
+| Collection | every **15 minutes**, **16 main stations**, unattended in Azure |
+| Volume | about **100,000 departures** every two weeks (7,600 per weekday) |
+| Result | **98.1 %** of departures on time over 26 October – 8 November 2026, with **94.4 %** real-time coverage ([findings](#findings)) |
+
+![Overview page of the Power BI report](docs/powerbi_overview.png)
+
+**What the project shows**
+
+- **Ingestion**: Azure Function on a timer, REST API and Oracle reference data, retries and per-station error isolation, Parquet bronze in ADLS Gen2; secrets in Key Vault, managed identity.
+- **Lakehouse and modelling**: OneLake shortcut, Fabric Lakehouse, dbt on a Fabric Warehouse (staging → intermediate → star schema), rules derived from profiling the raw data.
+- **Quality**: dbt tests on keys, relationships and value ranges at every build, source freshness checks, 48 unit tests of the ingestion, a data quality page in the report.
+- **Automation**: GitHub Actions for lint, tests and deployment, hourly `dbt build` followed by the refresh of the Direct Lake model; OIDC instead of stored secrets.
+- **Operations**: alerts on failed runs and on silence at each stage, from the Azure Function to the Fabric notebook.
+- **Reporting and GIS**: four-page Power BI report and a QGIS map built from the Warehouse with swisstopo and SITN geoservices.
 
 ## Architecture
 
@@ -29,8 +44,6 @@ including a Tableau → Power BI report migration.
 ## Findings
 
 Period 26 October – 8 November 2026, 16 main stations, about 100,000 scheduled departures. A departure is late when it leaves 3 minutes or more after the timetable; the delay is the last value published before departure (see [Known limitations](#known-limitations)).
-
-![Overview page of the Power BI report](docs/powerbi_overview.png)
 
 - **Punctuality is high: 98.1 % of departures with real-time data leave on time**, with an average delay of 0.3 minutes. Real-time data covers 94.4 % of departures. The daily rate stays between 97.2 % and 99.0 %; the lowest days are 3 and 4 November.
 - **Late departures are concentrated in a few stations.** Lugano (4.9 %), Sion (3.9 %) and Lausanne (3.8 %) have the highest shares; Luzern (0.4 %), La Chaux-de-Fonds (0.7 %) and Bern (0.9 %) the lowest. By language region: Italian 4.9 %, French 2.7 %, German 1.5 %. The Italian-speaking region is represented by Lugano alone.
