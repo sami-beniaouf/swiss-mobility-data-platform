@@ -43,6 +43,10 @@ Period 26 October – 8 November 2026, 16 main stations, about 100,000 scheduled
 
 - **International trains are the least punctual.** EuroCity (11.5 % late), NightJet (9.7 %) and TGV (8.4 %) are far above the domestic categories: IC 3.5 %, IR 1.8 %, RE 1.7 %, S-Bahn 0.9 %. These trains start abroad and arrive in Switzerland with their delay; they also weigh on the stations they serve, such as Lugano (EuroCity to and from Milan), Genève and Lausanne (TGV).
 
+![Data quality](docs/powerbi_quality.png)
+
+- **The data is complete, the real-time coverage is not uniform.** About 7,600 departures are ingested per weekday, with no gap over the period; the lower days are weekends, which run fewer trains. The real-time coverage varies between 90 % and 97 % per day, with lows on 26 and 29 October and 5 November, when the punctuality rests on fewer trains. ICE departures have real-time data in only 53 % of cases, which also explains the lowest station coverage, Basel SBB (82.8 %). The report shows the coverage next to every punctuality figure for this reason.
+
 These figures describe two weeks of data and the delay known before departure; they show where and when delays occur, not their causes.
 
 ## Repository layout

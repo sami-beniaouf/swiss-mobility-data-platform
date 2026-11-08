@@ -4,3 +4,8 @@
 *.sql text eol=lf
 Dockerfile text eol=lf
 *.yml text eol=lf
+
+# Fabric workspace items are written by Fabric Git integration: keep them byte for byte as
+# Fabric commits them (no line-ending conversion on checkout), so a pull from Fabric never
+# shows files as modified on Windows.
+fabric/** -text
