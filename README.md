@@ -4,7 +4,7 @@ End-to-end data platform on **Microsoft Fabric** using Swiss public transport op
 Oracle data hub + REST APIs → Fabric Lakehouse → dbt (Fabric Warehouse) → Power BI,
 including a Tableau → Power BI report migration.
 
-> Status: ingestion running in Azure every 15 minutes (Oracle Cloud hub → ADLS bronze) with failure and heartbeat alerts; bronze loaded hourly into a Fabric Lakehouse; silver and gold built and tested by dbt in a Fabric Warehouse every hour from GitHub Actions. Power BI report in progress.
+> Status: ingestion running in Azure every 15 minutes (Oracle Cloud hub → ADLS bronze) with failure and heartbeat alerts; bronze loaded hourly into a Fabric Lakehouse; silver and gold built and tested by dbt in a Fabric Warehouse every hour from GitHub Actions, followed by a refresh of the Power BI report (Direct Lake); station map in QGIS.
 
 ## Architecture
 
@@ -25,6 +25,25 @@ including a Tableau → Power BI report migration.
                Power BI (Direct Lake)
                QGIS (GeoPackage export of the marts)
 ```
+
+## Findings
+
+Period 26 October – 8 November 2026, 16 main stations, about 100,000 scheduled departures. A departure is late when it leaves 3 minutes or more after the timetable; the delay is the last value published before departure (see [Known limitations](#known-limitations)).
+
+![Overview page of the Power BI report](docs/powerbi_overview.png)
+
+- **Punctuality is high: 98.1 % of departures with real-time data leave on time**, with an average delay of 0.3 minutes. Real-time data covers 94.4 % of departures. The daily rate stays between 97.2 % and 99.0 %; the lowest days are 3 and 4 November.
+- **Late departures are concentrated in a few stations.** Lugano (4.9 %), Sion (3.9 %) and Lausanne (3.8 %) have the highest shares; Luzern (0.4 %), La Chaux-de-Fonds (0.7 %) and Bern (0.9 %) the lowest. By language region: Italian 4.9 %, French 2.7 %, German 1.5 %. The Italian-speaking region is represented by Lugano alone.
+
+![When are trains late?](docs/powerbi_when.png)
+
+- **Delays follow the daily load.** Around 1 % of departures are late at midday, about 2.5 % in the morning peak (7:00–8:00) and the share rises through the evening to about 4 % after 22:00, as delays accumulate over the day. Weekdays (1.9 %) are slightly worse than weekends (1.6 %). The high shares between midnight and 3:00 on weekends concern the night network and rest on few trains.
+
+![Where and which trains?](docs/powerbi_where.png)
+
+- **International trains are the least punctual.** EuroCity (11.5 % late), NightJet (9.7 %) and TGV (8.4 %) are far above the domestic categories: IC 3.5 %, IR 1.8 %, RE 1.7 %, S-Bahn 0.9 %. These trains start abroad and arrive in Switzerland with their delay; they also weigh on the stations they serve, such as Lugano (EuroCity to and from Milan), Genève and Lausanne (TGV).
+
+These figures describe two weeks of data and the delay known before departure; they show where and when delays occur, not their causes.
 
 ## Repository layout
 

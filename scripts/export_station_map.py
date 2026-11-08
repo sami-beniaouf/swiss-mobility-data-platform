@@ -46,7 +46,7 @@ QUERY = """
     from marts.fct_departures f
     join marts.dim_station s on s.station_id = f.station_id
     join marts.dim_date d on d.date_key = f.date_key
-    where d.calendar_date >= dateadd(day, -1 * ?, cast(getdate() as date))
+    where d.calendar_date > dateadd(day, -1 * ?, cast(getdate() as date))   -- last N days, today included
     group by s.station_id, s.station_name, s.canton_code, s.canton_name, s.language_region,
              s.municipality_bfs_nr, s.lv95_e, s.lv95_n
 """
