@@ -1,7 +1,7 @@
 name: dbt build
 
 # Builds and tests silver and gold in the Fabric Warehouse, every hour and on demand,
-# then checks that the bronze data is fresh.
+# refreshes the Power BI semantic model, then checks that the bronze data is fresh.
 # Runs after the hourly Fabric notebook that loads bronze into the Lakehouse.
 on:
   schedule:
@@ -56,6 +56,27 @@ jobs:
       # seed + run + test in dependency order: a failing test stops the models built on it.
       - name: dbt build
         run: dbt build --target prod
+
+      # dbt rebuilds the gold tables (new Parquet files in OneLake). The Direct Lake model
+      # keeps pointing to the previous files until it is refreshed ("reframed"), so it is
+      # refreshed after every successful build. Same identity, Power BI REST API.
+      - name: Refresh the semantic model
+        env:
+          REFRESHES_URL: https://api.powerbi.com/v1.0/myorg/groups/${{ vars.FABRIC_WORKSPACE_ID }}/datasets/${{ vars.SEMANTIC_MODEL_ID }}/refreshes
+          POWER_BI: https://analysis.windows.net/powerbi/api
+        run: |
+          az rest --method post --resource "$POWER_BI" --url "$REFRESHES_URL" \
+            --body '{"notifyOption": "NoNotification"}'
+          for attempt in $(seq 1 30); do
+            sleep 10
+            status=$(az rest --method get --resource "$POWER_BI" --url "$REFRESHES_URL?\$top=1" \
+              --query "value[0].status" --output tsv)
+            echo "Refresh status: $status"
+            if [ "$status" = "Completed" ]; then exit 0; fi
+            if [ "$status" = "Failed" ]; then exit 1; fi
+          done
+          echo "Refresh not finished after 5 minutes"
+          exit 1
 
       # Fails when the newest bronze row is older than error_after in _sources.yml
       # (transport: 24 h, Oracle snapshot: 72 h). Checks the end of the chain: Function,
