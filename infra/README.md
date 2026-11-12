@@ -58,13 +58,36 @@ terraform apply changes.tfplan
 `terraform.tfvars` holds the subscription ID, the alert e-mail address and the Oracle
 connect descriptor; it is git-ignored.
 
+## Making a change
+
+Every change goes through the code; the portal is used to look, not to change.
+
+1. Edit the `.tf` files: add a block to create a resource, change a value to update it,
+   remove a block to delete it.
+2. `terraform plan -out=changes.tfplan` and read the plan. Terraform reads the deployed
+   resources first, then compares them with the code and the state. `-/+` means the
+   resource is deleted and recreated: often caused by a value that cannot change in
+   place, sometimes by a difference that Azure ignores (upper and lower case in an
+   ID). It is resolved in the code before applying.
+3. `terraform apply changes.tfplan` applies exactly the plan that was read.
+
+A change made in the portal shows up in the next plan as a difference with the code
+(drift); it is either written into the code or reverted by the next apply.
+
+`terraform destroy` deletes every resource recorded in the state. It is meant for
+test environments only (see below).
+
 ## New environment
 
 The same configuration creates the platform in another subscription:
 
-1. create the state storage (above) and adapt `backend.hcl`;
+1. create the state storage (above) and adapt `backend.hcl`, or use another `key` so
+   that the environment gets its own state;
 2. choose new names in `terraform.tfvars` (storage account and Key Vault names are
    unique across Azure) and leave out `log_analytics_workspace_id` to create a workspace;
 3. `terraform apply`;
 4. set the three Oracle secrets in the Key Vault;
 5. deploy the Function code from GitHub Actions.
+
+A test environment created this way is removed with `terraform destroy`, which deletes
+only the resources of its own state.
