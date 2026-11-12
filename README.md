@@ -17,7 +17,7 @@ Cloud data platform on Azure and **Microsoft Fabric** that measures the punctual
 - **Ingestion**: Azure Function on a timer, REST API and Oracle reference data, retries and per-station error isolation, Parquet bronze in ADLS Gen2; secrets in Key Vault, managed identity.
 - **Lakehouse and modelling**: OneLake shortcut, Fabric Lakehouse, dbt on a Fabric Warehouse (staging → intermediate → star schema), rules derived from profiling the raw data.
 - **Quality**: dbt tests on keys, relationships and value ranges at every build, source freshness checks, 48 unit tests of the ingestion, a data quality page in the report.
-- **Automation**: GitHub Actions for lint, tests and deployment, hourly `dbt build` followed by the refresh of the Direct Lake model; OIDC instead of stored secrets.
+- **Automation**: Azure resources described in Terraform with a remote state; GitHub Actions for lint, tests and deployment, hourly `dbt build` followed by the refresh of the Direct Lake model; OIDC instead of stored secrets.
 - **Operations**: alerts on failed runs and on silence at each stage, from the Azure Function to the Fabric notebook.
 - **Reporting and GIS**: four-page Power BI report and a QGIS map built from the Warehouse with swisstopo and SITN geoservices.
 
@@ -56,6 +56,7 @@ These figures describe two weeks of data and the delay known before departure; t
 | `oracle/init/` | Loads `oracle/sql/*.sql` on the first container start |
 | `scripts/check_setup.py` | Smoke test of the local stack |
 | `scripts/export_station_map.py` | Export of the station punctuality from the Warehouse to a GeoPackage (EPSG:2056) |
+| `infra/` | Terraform configuration of the Azure resources, remote state in Azure Storage |
 | `gis/` | QGIS project and the script that builds and exports its print layout |
 | `docs/` | Exported map |
 | `src/ingestion/` | Ingestion job: stations from Oracle → stationboard API → bronze Parquet |
@@ -270,6 +271,12 @@ Tests locally:
 docker compose exec toolbox ruff check src tests
 docker compose exec toolbox python -m pytest
 ```
+
+### Infrastructure as Code
+
+The Azure resources are described in Terraform (`infra/`): resource group, data lake, Key Vault, Function App with its plan, storage and app settings, Application Insights, action group, the two alert rules and the role assignments of the platform (18 resources). They were created by hand first and adopted with `import` blocks, until `terraform plan` reported no changes against the running platform. The state is stored in Azure Storage, with versioning.
+
+The configuration keeps three things out of Terraform: secret values (they would be written to the state), the Function code (deployed by GitHub Actions) and the Fabric items (versioned by the Fabric Git integration). Names, region and identities are variables, so the same configuration can create the platform in another subscription; see [`infra/README.md`](infra/README.md).
 
 ### Fabric: Lakehouse and Warehouse
 
