@@ -1,3 +1,8 @@
 subscription_id  = "00000000-0000-0000-0000-000000000000"
 alert_email      = "oncall@example.com"
 oracle_cloud_dsn = "(description=(address=(protocol=tcps)(port=1522)(host=adb.<region>.oraclecloud.com))(connect_data=(service_name=<service>.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))"
+
+# Object IDs (az ad sp show --id <app id> --query id -o tsv, or az ad user show)
+local_sp_object_id        = "00000000-0000-0000-0000-000000000000"
+github_sp_object_id       = "00000000-0000-0000-0000-000000000000"
+fabric_shortcut_object_id = "00000000-0000-0000-0000-000000000000"
