@@ -1,80 +1,85 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="634" viewBox="0 0 1240 634" role="img" aria-label="CI/CD of the Swiss Mobility Data Platform">
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="704" viewBox="0 0 1240 704" role="img" aria-label="CI/CD of the Swiss Mobility Data Platform">
 <defs><marker id="a667085" markerWidth="9" markerHeight="9" markerUnits="userSpaceOnUse" refX="8" refY="4.5" orient="auto"><path d="M0,0 L9,4.5 L0,9 z" fill="#667085"/></marker></defs>
-<rect width="1240" height="634" fill="#ffffff"/>
-<rect x="16.0" y="16.0" width="1208.0" height="250.0" rx="16" fill="#fbfaff" stroke="#c9bdf0" stroke-width="1.2"/>
+<rect width="1240" height="704" fill="#ffffff"/>
+<rect x="16.0" y="16.0" width="1208.0" height="320.0" rx="16" fill="#fbfaff" stroke="#c9bdf0" stroke-width="1.2"/>
 <text x="30.0" y="42.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#4b2fa6" text-anchor="start">ci.yml: on every push and pull request</text>
 <text x="30.0" y="62.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">nothing reaches Azure unless every check passes</text>
-<rect x="28.0" y="120.0" width="156.0" height="90.0" rx="12" fill="#ffffff" stroke="#98a2b3" stroke-width="1.5"/>
-<text x="106.0" y="149.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">git push</text>
-<text x="106.0" y="171.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">any branch, or a</text>
-<text x="106.0" y="189.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">pull request to main</text>
-<rect x="224.0" y="82.0" width="168.0" height="76.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
-<text x="308.0" y="104.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">test</text>
-<text x="308.0" y="126.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">ruff lint + 48 pytest</text>
-<text x="308.0" y="144.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">tests, no network</text>
-<rect x="224.0" y="186.0" width="168.0" height="76.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
-<text x="308.0" y="208.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">dbt</text>
-<text x="308.0" y="230.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">dbt parse: project</text>
-<text x="308.0" y="248.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">compiles, no connection</text>
-<rect x="452.0" y="120.0" width="188.0" height="90.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
-<text x="546.0" y="149.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">deploy</text>
-<text x="546.0" y="171.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">main only, both jobs green</text>
-<text x="546.0" y="189.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">login by OIDC, no secret</text>
-<rect x="700.0" y="120.0" width="188.0" height="90.0" rx="12" fill="#e8f1fc" stroke="#2e7bcf" stroke-width="1.5"/>
-<text x="794.0" y="149.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Azure Function</text>
-<text x="794.0" y="171.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">func-swissmobility-sb</text>
-<text x="794.0" y="189.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">code in src/ replaced</text>
-<polyline points="184.0,165.0 204.0,165.0 204.0,120.0 220.0,120.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
-<polyline points="204.0,165.0 204.0,224.0 220.0,224.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
-<polyline points="392.0,120.0 412.0,120.0 412.0,165.0 448.0,165.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
-<polyline points="392.0,224.0 412.0,224.0 412.0,165.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
-<polyline points="640.0,165.0 696.0,165.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
-<text x="918.0" y="144.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">App settings, secrets, roles and</text>
-<text x="918.0" y="162.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">alert rules are not deployed:</text>
-<text x="918.0" y="180.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">they are set once in Azure.</text>
-<rect x="16.0" y="282.0" width="1208.0" height="190.0" rx="16" fill="#fbfaff" stroke="#c9bdf0" stroke-width="1.2"/>
-<text x="30.0" y="308.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#4b2fa6" text-anchor="start">dbt-build.yml: every hour at minute 20, and on demand</text>
-<text x="30.0" y="328.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">builds the Warehouse in production and keeps the report in step</text>
-<rect x="28.0" y="352.0" width="156.0" height="96.0" rx="12" fill="#ffffff" stroke="#98a2b3" stroke-width="1.5"/>
-<text x="106.0" y="384.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Schedule</text>
-<text x="106.0" y="406.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">cron 20 * * * *</text>
-<text x="106.0" y="424.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">or Run workflow</text>
-<rect x="224.0" y="352.0" width="168.0" height="96.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
-<text x="308.0" y="384.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Azure login</text>
-<text x="308.0" y="406.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">OIDC as</text>
-<text x="308.0" y="424.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">sp-swissmobility-dbt</text>
-<polyline points="184.0,400.0 220.0,400.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
-<rect x="432.0" y="352.0" width="168.0" height="96.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
-<text x="516.0" y="384.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">dbt build</text>
-<text x="516.0" y="406.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">seed, models and tests</text>
-<text x="516.0" y="424.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">in dependency order</text>
-<polyline points="392.0,400.0 428.0,400.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
-<rect x="640.0" y="352.0" width="168.0" height="96.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
-<text x="724.0" y="384.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Refresh model</text>
-<text x="724.0" y="406.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">Power BI API, after</text>
-<text x="724.0" y="424.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">60 s, up to 3 tries</text>
-<polyline points="600.0,400.0 636.0,400.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
-<rect x="848.0" y="352.0" width="168.0" height="96.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
-<text x="932.0" y="384.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Source freshness</text>
-<text x="932.0" y="406.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">bronze older than</text>
-<text x="932.0" y="424.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">24 h fails the run</text>
-<polyline points="808.0,400.0 844.0,400.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
-<rect x="1056.0" y="352.0" width="168.0" height="96.0" rx="12" fill="#ffffff" stroke="#98a2b3" stroke-width="1.5"/>
-<text x="1140.0" y="384.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Artifacts</text>
-<text x="1140.0" y="406.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">run results and logs</text>
-<text x="1140.0" y="424.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">kept 14 days</text>
-<polyline points="1016.0,400.0 1052.0,400.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
-<rect x="16.0" y="488.0" width="1208.0" height="130.0" rx="16" fill="#fbfaff" stroke="#c9bdf0" stroke-width="1.2"/>
-<text x="30.0" y="514.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#4b2fa6" text-anchor="start">Fabric Git integration</text>
-<text x="30.0" y="534.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">report, semantic model, notebook and Lakehouse definitions are versioned with the code</text>
-<rect x="28.0" y="548.0" width="364.0" height="56.0" rx="12" fill="#e7f6ee" stroke="#23935f" stroke-width="1.5"/>
-<text x="210.0" y="589.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Fabric workspace ws-swiss-mobility</text>
-<rect x="640.0" y="548.0" width="376.0" height="56.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
-<text x="828.0" y="589.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Git: fabric/workspace/ on main</text>
-<polyline points="392.0,566.0 636.0,566.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
-<polyline points="640.0,588.0 396.0,588.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
-<text x="516.0" y="560.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">commit from Fabric</text>
-<text x="516.0" y="604.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">update from Git</text>
-<text x="1076.0" y="572.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">one direction at a time,</text>
-<text x="1076.0" y="590.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">after green CI</text>
+<rect x="28.0" y="111.0" width="156.0" height="90.0" rx="12" fill="#ffffff" stroke="#98a2b3" stroke-width="1.5"/>
+<text x="106.0" y="140.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">git push</text>
+<text x="106.0" y="162.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">any branch, or a</text>
+<text x="106.0" y="180.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">pull request to main</text>
+<rect x="224.0" y="80.0" width="168.0" height="70.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
+<text x="308.0" y="99.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">test</text>
+<text x="308.0" y="121.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">ruff lint + 48 pytest</text>
+<text x="308.0" y="139.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">tests, no network</text>
+<rect x="224.0" y="162.0" width="168.0" height="70.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
+<text x="308.0" y="181.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">dbt</text>
+<text x="308.0" y="203.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">dbt parse: project</text>
+<text x="308.0" y="221.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">compiles, no connection</text>
+<rect x="224.0" y="244.0" width="168.0" height="70.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
+<text x="308.0" y="263.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">terraform</text>
+<text x="308.0" y="285.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">fmt + validate on infra/</text>
+<text x="308.0" y="303.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">no Azure access</text>
+<rect x="452.0" y="111.0" width="188.0" height="90.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
+<text x="546.0" y="140.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">deploy</text>
+<text x="546.0" y="162.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">main only, test and dbt</text>
+<text x="546.0" y="180.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">green · login by OIDC</text>
+<rect x="700.0" y="111.0" width="188.0" height="90.0" rx="12" fill="#e8f1fc" stroke="#2e7bcf" stroke-width="1.5"/>
+<text x="794.0" y="140.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Azure Function</text>
+<text x="794.0" y="162.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">func-swissmobility-sb</text>
+<text x="794.0" y="180.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">code in src/ replaced</text>
+<polyline points="184.0,156.0 204.0,156.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<polyline points="204.0,156.0 204.0,115.0 220.0,115.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<polyline points="204.0,156.0 204.0,197.0 220.0,197.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<polyline points="204.0,156.0 204.0,279.0 220.0,279.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<polyline points="392.0,115.0 412.0,115.0 412.0,156.0 448.0,156.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<polyline points="392.0,197.0 412.0,197.0 412.0,156.0 448.0,156.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<polyline points="640.0,156.0 696.0,156.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<text x="452.0" y="274.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">The Azure resources themselves are described in Terraform</text>
+<text x="452.0" y="292.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">(infra/) and applied with terraform apply after a reviewed plan.</text>
+<rect x="16.0" y="352.0" width="1208.0" height="190.0" rx="16" fill="#fbfaff" stroke="#c9bdf0" stroke-width="1.2"/>
+<text x="30.0" y="378.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#4b2fa6" text-anchor="start">dbt-build.yml: every hour at minute 20, and on demand</text>
+<text x="30.0" y="398.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">builds the Warehouse in production and keeps the report in step</text>
+<rect x="28.0" y="422.0" width="156.0" height="96.0" rx="12" fill="#ffffff" stroke="#98a2b3" stroke-width="1.5"/>
+<text x="106.0" y="454.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" font-weight="bold" fill="#1d2939" text-anchor="middle">Schedule</text>
+<text x="106.0" y="476.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">cron 20 * * * *</text>
+<text x="106.0" y="494.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="middle">or Run workflow</text>
+<rect x="224.0" y="422.0" width="168.0" height="96.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
+<text x="308.0" y="454.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Azure login</text>
+<text x="308.0" y="476.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">OIDC as</text>
+<text x="308.0" y="494.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">sp-swissmobility-dbt</text>
+<polyline points="184.0,470.0 220.0,470.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<rect x="432.0" y="422.0" width="168.0" height="96.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
+<text x="516.0" y="454.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">dbt build</text>
+<text x="516.0" y="476.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">seed, models and tests</text>
+<text x="516.0" y="494.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">in dependency order</text>
+<polyline points="392.0,470.0 428.0,470.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<rect x="640.0" y="422.0" width="168.0" height="96.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
+<text x="724.0" y="454.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Refresh model</text>
+<text x="724.0" y="476.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">Power BI API, after</text>
+<text x="724.0" y="494.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">60 s, up to 3 tries</text>
+<polyline points="600.0,470.0 636.0,470.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<rect x="848.0" y="422.0" width="168.0" height="96.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
+<text x="932.0" y="454.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Source freshness</text>
+<text x="932.0" y="476.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">bronze older than</text>
+<text x="932.0" y="494.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">24 h fails the run</text>
+<polyline points="808.0,470.0 844.0,470.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<rect x="1056.0" y="422.0" width="168.0" height="96.0" rx="12" fill="#ffffff" stroke="#98a2b3" stroke-width="1.5"/>
+<text x="1140.0" y="454.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Artifacts</text>
+<text x="1140.0" y="476.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">run results and logs</text>
+<text x="1140.0" y="494.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12" font-weight="normal" fill="#475467" text-anchor="middle">kept 14 days</text>
+<polyline points="1016.0,470.0 1052.0,470.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<rect x="16.0" y="558.0" width="1208.0" height="130.0" rx="16" fill="#fbfaff" stroke="#c9bdf0" stroke-width="1.2"/>
+<text x="30.0" y="584.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#4b2fa6" text-anchor="start">Fabric Git integration</text>
+<text x="30.0" y="604.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">report, semantic model, notebook and Lakehouse definitions are versioned with the code</text>
+<rect x="28.0" y="618.0" width="364.0" height="56.0" rx="12" fill="#e7f6ee" stroke="#23935f" stroke-width="1.5"/>
+<text x="210.0" y="659.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Fabric workspace ws-swiss-mobility</text>
+<rect x="640.0" y="618.0" width="376.0" height="56.0" rx="12" fill="#f2f0fb" stroke="#6d4fc2" stroke-width="1.5"/>
+<text x="828.0" y="659.5" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="14" font-weight="bold" fill="#1d2939" text-anchor="middle">Git: fabric/workspace/ on main</text>
+<polyline points="392.0,636.0 636.0,636.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<polyline points="640.0,658.0 396.0,658.0" fill="none" stroke="#667085" stroke-width="2" marker-end="url(#a667085)" stroke-linejoin="round"/>
+<text x="516.0" y="630.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">commit from Fabric</text>
+<text x="516.0" y="674.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="11.5" font-weight="normal" fill="#475467" text-anchor="middle">update from Git</text>
+<text x="1076.0" y="642.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">one direction at a time,</text>
+<text x="1076.0" y="660.0" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="12.5" font-weight="normal" fill="#475467" text-anchor="start">after green CI</text>
 </svg>
