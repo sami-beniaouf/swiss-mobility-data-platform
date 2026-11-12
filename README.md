@@ -259,6 +259,7 @@ Two GitHub Actions workflows, plus the Git integration of the Fabric workspace:
 |---|---|---|
 | `test` | every push and pull request | lint, then the unit tests against the Function's own dependencies (`tests/requirements.txt` includes `src/requirements.txt`) |
 | `dbt` | every push and pull request | `dbt parse`: the dbt project compiles, without connecting to the Warehouse |
+| `terraform` | every push and pull request | `terraform fmt -check` and `terraform validate` on `infra/`, without access to Azure |
 | `deploy` | push to `main`, only if `test` and `dbt` passed | replaces the code of `func-swissmobility-sb`; one deployment at a time |
 
 The deploy job authenticates with **workload identity federation**: no secret is stored. The app registration `sp-swissmobility-github` trusts GitHub tokens for `repo:sami-beniaouf/swiss-mobility-data-platform`, branch `main` only, and has the role **Website Contributor** on the Function App only. The repository secrets `AZURE_CLIENT_ID`, `AZURE_TENANT_ID` and `AZURE_SUBSCRIPTION_ID` hold identifiers, not credentials; they are stored as secrets to keep them out of public logs.

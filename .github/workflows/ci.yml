@@ -1,6 +1,7 @@
 name: CI/CD
 
-# Lint, tests and the dbt parse check run on every push and on pull requests to main.
+# Lint, tests, the dbt parse check and the Terraform check run on every push and on
+# pull requests to main.
 # Deployment to Azure runs only on a push to main, and only when all checks passed.
 on:
   push:
@@ -66,6 +67,34 @@ jobs:
         run: dbt parse
         env:
           DBT_PROFILES_DIR: ci
+
+  terraform:
+    name: Check the Terraform configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: infra
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@v5
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v4
+        with:
+          terraform_version: "1.17.2"
+
+      # Style (indentation, alignment) and configuration checks, without access to
+      # Azure: -backend=false skips the remote state, validate needs no credentials.
+      - name: Format (terraform fmt)
+        run: terraform fmt -check -diff
+
+      - name: Initialise without backend
+        run: terraform init -backend=false -input=false
+
+      - name: Validate (terraform validate)
+        run: terraform validate
 
   deploy:
     name: Deploy to Azure Functions
