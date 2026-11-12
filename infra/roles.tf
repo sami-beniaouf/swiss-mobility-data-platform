@@ -1,9 +1,17 @@
+# Some assignments were created with a lower-case "resourcegroups" in their scope.
+# Azure treats both spellings as the same resource, Terraform does not: the scope is
+# written exactly as stored, otherwise Terraform would delete and recreate the assignment.
+locals {
+  lake_scope_lc     = replace(azurerm_storage_account.lake.id, "/resourceGroups/", "/resourcegroups/")
+  function_scope_lc = replace(azurerm_function_app_flex_consumption.ingestion.id, "/resourceGroups/", "/resourcegroups/")
+}
+
 # Permissions the platform needs to run. Personal administration access (Reader,
 # Key Vault Secrets Officer for people) is granted outside this configuration.
 
 # Function managed identity: writes bronze files, reads the Oracle secrets.
 resource "azurerm_role_assignment" "function_lake" {
-  scope                = azurerm_storage_account.lake.id
+  scope                = local.lake_scope_lc
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_function_app_flex_consumption.ingestion.identity[0].principal_id
 }
@@ -23,14 +31,14 @@ resource "azurerm_role_assignment" "local_lake" {
 
 # GitHub Actions deploys the code of this Function App only.
 resource "azurerm_role_assignment" "github_deploy" {
-  scope                = azurerm_function_app_flex_consumption.ingestion.id
+  scope                = local.function_scope_lc
   role_definition_name = "Website Contributor"
   principal_id         = var.github_sp_object_id
 }
 
 # The OneLake shortcut reads bronze files, nothing else.
 resource "azurerm_role_assignment" "fabric_shortcut" {
-  scope                = azurerm_storage_account.lake.id
+  scope                = local.lake_scope_lc
   role_definition_name = "Storage Blob Data Reader"
   principal_id         = var.fabric_shortcut_object_id
 }
