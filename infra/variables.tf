@@ -3,6 +3,32 @@ variable "subscription_id" {
   type        = string
 }
 
+variable "location" {
+  description = "Azure region of every resource"
+  type        = string
+  default     = "switzerlandnorth"
+}
+
+variable "names" {
+  description = "Resource names. Storage account and Key Vault names are unique across Azure."
+  type = object({
+    resource_group           = string
+    lake_storage             = string # 3-24 lower-case letters and digits
+    function_storage         = string
+    function_package         = string # blob container holding the deployed code
+    key_vault                = string
+    service_plan             = string
+    function_app             = string # also the name of Application Insights
+    action_group             = string
+  })
+}
+
+variable "log_analytics_workspace_id" {
+  description = "Existing Log Analytics workspace for Application Insights; null creates one"
+  type        = string
+  default     = null
+}
+
 variable "alert_email" {
   description = "Address notified by the action group"
   type        = string

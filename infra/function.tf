@@ -1,5 +1,5 @@
 resource "azurerm_service_plan" "function" {
-  name                = "ASP-rgswissmobility-ae23"
+  name                = var.names.service_plan
   resource_group_name = azurerm_resource_group.main.name
   location            = local.location
   os_type             = "Linux"
@@ -9,7 +9,7 @@ resource "azurerm_service_plan" "function" {
 # Ingestion: timer triggers every 15 minutes (departures) and daily (reference data).
 # The code is deployed by GitHub Actions, not by Terraform.
 resource "azurerm_function_app_flex_consumption" "ingestion" {
-  name                = "func-swissmobility-sb"
+  name                = var.names.function_app
   resource_group_name = azurerm_resource_group.main.name
   location            = local.location
   service_plan_id     = azurerm_service_plan.function.id
@@ -24,7 +24,7 @@ resource "azurerm_function_app_flex_consumption" "ingestion" {
   webdeploy_publish_basic_authentication_enabled = false # deployment uses Entra ID (OIDC), not basic auth
 
   storage_container_type      = "blobContainer"
-  storage_container_endpoint  = "${azurerm_storage_account.function.primary_blob_endpoint}app-package-func-swissmobility-sb-3597edc"
+  storage_container_endpoint  = "${azurerm_storage_account.function.primary_blob_endpoint}${azurerm_storage_container.function_package.name}"
   storage_authentication_type = "StorageAccountConnectionString"
   storage_access_key          = azurerm_storage_account.function.primary_access_key
 
@@ -54,6 +54,6 @@ resource "azurerm_function_app_flex_consumption" "ingestion" {
   }
 
   tags = {
-    "hidden-link: /app-insights-resource-id" = "${local.rg_id}/providers/microsoft.insights/components/func-swissmobility-sb"
+    "hidden-link: /app-insights-resource-id" = local.app_insights_scope
   }
 }

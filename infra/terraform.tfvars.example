@@ -1,4 +1,18 @@
 subscription_id  = "00000000-0000-0000-0000-000000000000"
+
+names = {
+  resource_group   = "rg-swissmobility"
+  lake_storage     = "stswissmobilitylake"
+  function_storage = "stswissmobilityfunc"
+  function_package = "app-package"
+  key_vault        = "kv-swissmobility"
+  service_plan     = "asp-swissmobility"
+  function_app     = "func-swissmobility"
+  action_group     = "ag-swissmobility-oncall"
+}
+
+# Existing Log Analytics workspace; leave out to create one
+# log_analytics_workspace_id = "/subscriptions/.../workspaces/..."
 alert_email      = "oncall@example.com"
 oracle_cloud_dsn = "(description=(address=(protocol=tcps)(port=1522)(host=adb.<region>.oraclecloud.com))(connect_data=(service_name=<service>.adb.oraclecloud.com))(security=(ssl_server_dn_match=yes)))"
 

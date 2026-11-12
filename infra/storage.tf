@@ -1,7 +1,7 @@
 # Data lake: bronze Parquet files written by the Function, read by Fabric through a
 # OneLake shortcut; "state" holds the station cache.
 resource "azurerm_storage_account" "lake" {
-  name                            = "stswissmobility"
+  name                            = var.names.lake_storage
   resource_group_name             = azurerm_resource_group.main.name
   location                        = local.location
   account_kind                    = "StorageV2"
@@ -36,7 +36,7 @@ resource "azurerm_storage_container" "state" {
 
 # Internal storage of the Function App: deployment packages and runtime files.
 resource "azurerm_storage_account" "function" {
-  name                            = "rgswissmobility9ce9"
+  name                            = var.names.function_storage
   resource_group_name             = azurerm_resource_group.main.name
   location                        = local.location
   account_kind                    = "StorageV2"
@@ -46,4 +46,10 @@ resource "azurerm_storage_account" "function" {
   min_tls_version                 = "TLS1_2"
   allow_nested_items_to_be_public = false
   default_to_oauth_authentication = true
+}
+
+resource "azurerm_storage_container" "function_package" {
+  name                  = var.names.function_package
+  storage_account_id    = azurerm_storage_account.function.id
+  container_access_type = "private"
 }

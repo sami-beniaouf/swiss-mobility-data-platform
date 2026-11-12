@@ -1,4 +1,4 @@
 resource "azurerm_resource_group" "main" {
-  name     = "rg-swiss_mobility"
+  name     = var.names.resource_group
   location = local.location
 }

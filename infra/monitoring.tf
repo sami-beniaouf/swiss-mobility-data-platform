@@ -4,24 +4,33 @@ locals {
   app_insights_scope = replace(azurerm_application_insights.function.id, "Microsoft.Insights", "microsoft.insights")
 }
 
-# Log Analytics workspace created by Azure for the region: used, not managed here.
-data "azurerm_log_analytics_workspace" "default" {
-  name                = "DefaultWorkspace-${var.subscription_id}-CHN"
-  resource_group_name = "DefaultResourceGroup-CHN"
+# Application Insights stores its data in a Log Analytics workspace: an existing one
+# (here the default workspace Azure created for the region) or a new one.
+resource "azurerm_log_analytics_workspace" "main" {
+  count               = var.log_analytics_workspace_id == null ? 1 : 0
+  name                = "log-${var.names.function_app}"
+  resource_group_name = azurerm_resource_group.main.name
+  location            = local.location
+  sku                 = "PerGB2018"
+  retention_in_days   = 30
+}
+
+locals {
+  log_analytics_workspace_id = coalesce(var.log_analytics_workspace_id, one(azurerm_log_analytics_workspace.main[*].id))
 }
 
 resource "azurerm_application_insights" "function" {
-  name                = "func-swissmobility-sb"
+  name                = var.names.function_app
   resource_group_name = azurerm_resource_group.main.name
   location            = local.location
   application_type    = "web"
-  workspace_id        = data.azurerm_log_analytics_workspace.default.id
+  workspace_id        = local.log_analytics_workspace_id
   retention_in_days   = 90
   sampling_percentage = 0
 }
 
 resource "azurerm_monitor_action_group" "oncall" {
-  name                = "ag-swissmobility-oncall"
+  name                = var.names.action_group
   resource_group_name = azurerm_resource_group.main.name
   short_name          = "sm-oncall"
 

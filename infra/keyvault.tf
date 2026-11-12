@@ -1,7 +1,7 @@
 # Oracle credentials. Secret values are not managed by Terraform: they would be
 # written to the state. They are set once with "az keyvault secret set".
 resource "azurerm_key_vault" "main" {
-  name                       = "kv-swissmobility-sb"
+  name                       = var.names.key_vault
   resource_group_name        = azurerm_resource_group.main.name
   location                   = local.location
   tenant_id                  = data.azurerm_client_config.current.tenant_id
