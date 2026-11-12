@@ -20,6 +20,9 @@ resource "azurerm_function_app_flex_consumption" "ingestion" {
   maximum_instance_count = 100
   https_only             = true
 
+  client_certificate_mode                        = "Required"
+  webdeploy_publish_basic_authentication_enabled = false # deployment uses Entra ID (OIDC), not basic auth
+
   storage_container_type      = "blobContainer"
   storage_container_endpoint  = "${azurerm_storage_account.function.primary_blob_endpoint}app-package-func-swissmobility-sb-3597edc"
   storage_authentication_type = "StorageAccountConnectionString"
