@@ -1,0 +1,12 @@
+# Provider plugins and local state
+.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+
+# Values specific to this subscription (subscription id, e-mail address)
+terraform.tfvars
+
+# Raw output of "terraform plan -generate-config-out": may contain keys or
+# connection strings, reviewed before anything is copied into the real files
+generated.tf
