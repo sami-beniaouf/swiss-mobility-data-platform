@@ -2,8 +2,8 @@
 # Azure treats both spellings as the same resource, Terraform does not: the scope is
 # written exactly as stored, otherwise Terraform would delete and recreate the assignment.
 locals {
-  lake_scope_lc     = replace(azurerm_storage_account.lake.id, "/resourceGroups/", "/resourcegroups/")
-  function_scope_lc = replace(azurerm_function_app_flex_consumption.ingestion.id, "/resourceGroups/", "/resourcegroups/")
+  lake_scope_lc     = replace(azurerm_storage_account.lake.id, "resourceGroups/", "resourcegroups/")
+  function_scope_lc = replace(azurerm_function_app_flex_consumption.ingestion.id, "resourceGroups/", "resourcegroups/")
 }
 
 # Permissions the platform needs to run. Personal administration access (Reader,
