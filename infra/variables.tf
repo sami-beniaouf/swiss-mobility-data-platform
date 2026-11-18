@@ -12,14 +12,14 @@ variable "location" {
 variable "names" {
   description = "Resource names. Storage account and Key Vault names are unique across Azure."
   type = object({
-    resource_group           = string
-    lake_storage             = string # 3-24 lower-case letters and digits
-    function_storage         = string
-    function_package         = string # blob container holding the deployed code
-    key_vault                = string
-    service_plan             = string
-    function_app             = string # also the name of Application Insights
-    action_group             = string
+    resource_group   = string
+    lake_storage     = string # 3-24 lower-case letters and digits
+    function_storage = string
+    function_package = string # blob container holding the deployed code
+    key_vault        = string
+    service_plan     = string
+    function_app     = string # also the name of Application Insights
+    action_group     = string
   })
 }
 
