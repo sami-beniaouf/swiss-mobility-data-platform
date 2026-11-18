@@ -15,7 +15,7 @@ Cloud data platform on Azure and **Microsoft Fabric** that measures the punctual
 **What the project shows**
 
 - **Ingestion**: Azure Function on a timer, REST API and Oracle reference data, retries and per-station error isolation, Parquet bronze in ADLS Gen2; secrets in Key Vault, managed identity.
-- **Lakehouse and modelling**: OneLake shortcut, Fabric Lakehouse, dbt on a Fabric Warehouse (staging → intermediate → star schema), rules derived from profiling the raw data.
+- **Lakehouse and modelling**: OneLake shortcut, incremental load of the bronze files into the Fabric Lakehouse, dbt on a Fabric Warehouse (staging → intermediate → star schema), rules derived from profiling the raw data.
 - **Quality**: dbt tests on keys, relationships and value ranges at every build, source freshness checks, 48 unit tests of the ingestion, a data quality page in the report.
 - **Automation**: Azure resources described in Terraform with a remote state; GitHub Actions for lint, tests and deployment, hourly `dbt build` followed by the refresh of the Direct Lake model; OIDC instead of stored secrets.
 - **Operations**: alerts on failed runs and on silence at each stage, from the Azure Function to the Fabric notebook.
@@ -287,10 +287,22 @@ Workspace `ws-swiss-mobility` (Fabric trial capacity):
 |---|---|
 | `lh_mobility` (Lakehouse) | bronze as Delta tables: `transport_stationboard`, `ingestion_log`, `oracle_stations`, `oracle_cantons` |
 | shortcut `Files/bronze` | link to the ADLS container `bronze` (no copy); connection as an organizational account with **Storage Blob Data Reader** on the container only |
-| `nb_load_bronze` (notebook, hourly) | reads the Parquet through the shortcut and rewrites the Delta tables (full reload, `mergeSchema` for older files) |
+| `nb_load_bronze` (notebook, hourly) | reads the Parquet through the shortcut and appends only the files not yet loaded to the Delta tables (incremental load, see below) |
 | `wh_mobility` (Warehouse) | silver and gold, built by dbt; reads the Lakehouse tables with cross-database queries (`lh_mobility.dbo.…`) |
 
 Bronze files are plain Parquet, so they are loaded by the notebook rather than exposed directly as tables (a table shortcut requires Delta, and shortcut file transformations were not available in the tenant).
+
+**Incremental load.** The ingestion writes one new Parquet file per run and never rewrites it, so the file is the unit of the load. Each row keeps the path of its source file in `_source_file`; at each run the notebook lists the bronze files, reads only those not yet in the table and appends them. The set of loaded files is read from the Delta table itself, so data and progress are written in one atomic operation: a failed append leaves nothing marked as loaded, and the next run picks the same files up. `FULL_REFRESH = True` rebuilds every table from all files.
+
+| Run (2,409 files, 3.86 M rows in `transport_stationboard`) | Duration |
+|---|---|
+| Full reload, the previous behaviour at every run | 57 s |
+| Incremental, one new file (1,603 rows) | 11 s |
+| Incremental, nothing new | 9 s |
+
+The remaining 9 s are the cost of listing the files and reading `_source_file`; it grows slowly with the number of files, where a full reload grows with the whole history. On a much larger history, limiting the listing to the last days (a date watermark) or Spark Structured Streaming with `trigger(availableNow=True)` would remove it.
+
+An incremental dbt model was also tested for `fct_departures` (watermark on the departure time, 24-hour overlap, `delete+insert` on `departure_id`). It was slower than the full rebuild (28 s against 22 s): most of the cost is the deduplication of the bronze polls upstream, which runs in full either way, and the delete and insert cost more than one `CREATE TABLE AS SELECT` of about 100,000 rows. The model therefore stays a table.
 
 The workspace is connected to this repository with **Fabric Git integration** (branch `main`, folder `fabric/workspace`): every item is versioned as text (`notebook-content.py`, `shortcuts.metadata.json`, the Warehouse as an SQL project). Changes made in Fabric are committed from the workspace's Source control panel. The Warehouse objects are created by dbt, which remains their source of truth: their Git copy is a snapshot, and "Update from Git" is not used for them. The GitHub connection uses a fine-grained token limited to this repository (Contents read and write, 90 days).
 
