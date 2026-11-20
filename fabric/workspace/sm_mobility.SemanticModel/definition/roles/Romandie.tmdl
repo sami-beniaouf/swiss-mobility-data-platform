@@ -1,0 +1,7 @@
+role Romandie
+	modelPermission: read
+
+	tablePermission dim_station = [language_region] IN { "French", "Bilingual", "Multilingual" }
+
+	annotation PBI_Id = 56888936e93e469b878d7ce7bd1f7e4f
+

@@ -1,0 +1,14 @@
+role Regional
+	modelPermission: read
+
+	tablePermission dim_station =
+			[language_region] IN
+			    CALCULATETABLE (
+			        VALUES ( security_user_region[language_region] ),
+			        security_user_region[user_email] = LOWER ( USERPRINCIPALNAME () )
+			    )
+
+	tablePermission security_user_region = [user_email] = LOWER ( USERPRINCIPALNAME () )
+
+	annotation PBI_Id = f7a091ad6bcb47fda194bc7fb1f2f540
+

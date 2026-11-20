@@ -1,0 +1,42 @@
+table security_user_region
+	isHidden
+	lineageTag: 4af281fc-c03e-4e32-9b60-d2e260958f0c
+	sourceLineageTag: [reference].[security_user_region]
+
+	column user_email
+		dataType: string
+		isHidden
+		sourceProviderType: varchar(320)
+		lineageTag: e031c0a5-dc03-41ef-b8c8-db9190af1320
+		sourceLineageTag: user_email
+		summarizeBy: none
+		sourceColumn: user_email
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	column language_region
+		dataType: string
+		isHidden
+		sourceProviderType: varchar(20)
+		lineageTag: 8026fe16-f4ce-4213-8cc8-41c8cf6ee625
+		sourceLineageTag: language_region
+		summarizeBy: none
+		sourceColumn: language_region
+
+		changedProperty = IsHidden
+
+		annotation SummarizationSetBy = Automatic
+
+	partition security_user_region = entity
+		mode: directLake
+		source
+			entityName: security_user_region
+			schemaName: reference
+			expressionSource: DatabaseQuery
+
+	changedProperty = IsHidden
+
+	annotation PBI_ResultType = Table
+

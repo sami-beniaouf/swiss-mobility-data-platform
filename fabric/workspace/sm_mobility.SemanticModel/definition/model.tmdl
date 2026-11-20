@@ -17,4 +17,8 @@ ref table dim_date
 ref table fct_departures
 ref table dim_line
 ref table dim_station
+ref table security_user_region
+
+ref role Romandie
+ref role Regional
 
