@@ -26,6 +26,10 @@ seeds:
         category: varchar(10)
         transport_mode: varchar(20)
         category_label: varchar(50)
+    security_user_region:
+      +column_types:
+        user_email: varchar(320)
+        language_region: varchar(20)
 
 models:
   swiss_mobility:
