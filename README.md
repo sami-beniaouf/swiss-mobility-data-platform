@@ -19,7 +19,7 @@ Cloud data platform on Azure and **Microsoft Fabric** that measures the punctual
 - **Quality**: dbt tests on keys, relationships and value ranges at every build, source freshness checks, 48 unit tests of the ingestion, a data quality page in the report.
 - **Automation**: Azure resources described in Terraform with a remote state; GitHub Actions for lint, tests and deployment, hourly `dbt build` followed by the refresh of the Direct Lake model; OIDC instead of stored secrets.
 - **Operations**: alerts on failed runs and on silence at each stage, from the Azure Function to the Fabric notebook.
-- **Reporting and GIS**: four-page Power BI report and a QGIS map built from the Warehouse with swisstopo and SITN geoservices.
+- **Reporting and GIS**: four-page Power BI report with static and dynamic row-level security, and a QGIS map built from the Warehouse with swisstopo and SITN geoservices.
 
 ## Architecture
 
@@ -346,6 +346,39 @@ docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt test     # 30 t
 |---|---|---|
 | `sp-swissmobility-dbt` | dbt from the toolbox | client secret in `.env` |
 | `sp-swissmobility-dbt` | scheduled dbt build | OIDC, no secret |
+
+### Row-level security
+
+One report, readers restricted to their language regions. The rules live in the semantic model `sm_mobility` (TMDL in `fabric/workspace/sm_mobility.SemanticModel/definition/roles/`). Both roles filter `dim_station`; the relationship `dim_station` → `fct_departures` carries the filter to every measure, including the data quality page.
+
+| Role | Method | Filter on `dim_station` | Members |
+|---|---|---|---|
+| `Romandie` | static: the regions are written in the rule | `[language_region] IN { "French", "Bilingual", "Multilingual" }` | Entra ID security group `sm-romandie` |
+| `Regional` | dynamic: the regions come from a mapping table | regions listed for `LOWER(USERPRINCIPALNAME())` in `security_user_region` | all readers of the report |
+
+The mapping `security_user_region` (one row per user and region) is a dbt seed loaded into the Warehouse (`reference` schema) at every build, with tests: no empty value, known regions only, no duplicate pair, lower-case addresses. It is added to the model as a hidden table without relationship; the role filters it to the reader's own rows, so nobody sees the addresses of others. The comparison uses `LOWER()` because the model compares text case-sensitively (collation `Latin1_General_100_BIN2_UTF8`): a capital letter in the table would leave the reader with no data. The addresses in the repository are examples, plus the account used for the tests.
+
+Static roles suit a few stable segments managed with groups by IT; the dynamic role suits many users or changing rights: access is granted by adding a row to the mapping, without changing the model. Romandie readers see French, bilingual and multilingual cantons, German-speaking readers German, bilingual and multilingual, Italian-speaking readers Italian and multilingual. Regions overlap, so the regional totals do not add up to the national figures.
+
+| Static role `Romandie` (10 stations) | Dynamic role `Regional`, test account mapped to French only (5 stations) |
+|---|---|
+| ![Report viewed as Romandie](docs/rls_romandie.png) | ![Report viewed as Regional](docs/rls_regional.png) |
+
+**Testing.** Workspace → `sm_mobility` → … → **Security** → a role → **Test as role**; the dynamic role can also be tested as another user. Test as role is not available while the model reads with single sign-on, which is one reason for the fixed identity below.
+
+**Where the rules apply.** Rules in the semantic model protect the report, not the Warehouse: anyone allowed to query the SQL endpoint reads all rows. They are therefore combined with least privilege:
+
+- the model reads the Warehouse with a **fixed identity** (cloud connection with single sign-on disabled), so readers need no permission on the Warehouse;
+- readers get the report or an app, not a workspace role: workspace Admins, Members and Contributors can edit the model and are not filtered, and Viewers can query the SQL endpoint.
+
+Defining the rules on the Warehouse instead (T-SQL security policy) would protect every access path, but a Direct Lake model on the SQL endpoint falls back to DirectQuery for tables protected there ([Microsoft Learn](https://learn.microsoft.com/en-us/fabric/fundamentals/direct-lake-security-integration)). OneLake security with a Direct Lake on OneLake model is Microsoft's recommended way to apply one rule to every engine; it would require rebuilding the model and is not used here.
+
+**Limitations**
+
+- The fixed identity is a personal account; in production it would be a service principal or the workspace identity, so that a password change or a departure does not break the report.
+- The region is that of the canton: the station Bern belongs to a bilingual canton and is visible to Romandie readers.
+- `dim_line` and `dim_date` are not filtered: line names remain visible in filters, without their figures.
+- The report subtitle "16 main stations" is a fixed text and does not follow the role.
 
 ### Map in QGIS
 
