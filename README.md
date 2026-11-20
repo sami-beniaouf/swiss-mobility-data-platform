@@ -327,15 +327,15 @@ lh_mobility (bronze)            wh_mobility
 
 Punctuality KPI: `SUM(is_punctual) / SUM(has_realtime)`, reported with the real-time coverage (`SUM(has_realtime) / COUNT(*)`).
 
-Tests (`dbt test`, 30): `unique` and `not_null` on every key, `relationships` between facts, dimensions, sources and the seed, `accepted_values` on flags and language regions, and the singular test `assert_delay_within_bounds` (0 to 300 minutes, bounds taken from the profiling).
+Tests (`dbt test`, 39): `unique` and `not_null` on every key, `relationships` between facts, dimensions, sources and the seed, `accepted_values` on flags and language regions, and three singular tests: `assert_delay_within_bounds` (0 to 300 minutes, bounds taken from the profiling), `assert_stations_inside_switzerland` and `assert_security_user_region_valid` (row-level security mapping, see below).
 
 **Connection.** dbt connects from the toolbox as the service principal `sp-swissmobility-dbt` (Contributor on the workspace; tenant setting "Service principals can use Fabric APIs" enabled). `profiles.yml` (git-ignored, copied from `profiles_example.yml`) uses `authentication: token_credential` with `azure.identity.ClientSecretCredential`: the token is acquired by azure-identity and passed to the driver. `ActiveDirectoryServicePrincipal` is not used because dbt-fabric 1.11 sends an `Authority Id` keyword its driver rejects. Credentials come from `.env` (`AZURE_TENANT_ID`, `DBT_CLIENT_ID`, `DBT_CLIENT_SECRET`).
 
 ```powershell
 docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt debug    # configuration and connection
-docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt seed     # transport_categories
+docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt seed     # transport_categories, security_user_region
 docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt run      # all models, in dependency order
-docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt test     # 30 tests
+docker compose exec -w /workspace/swiss-mobility-dbt toolbox dbt test     # 39 tests
 ```
 
 `dbt run --select staging` builds one layer only. The CI parses the project on every push (`dbt parse`, no connection).
