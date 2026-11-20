@@ -1,0 +1,18 @@
+version: 2
+
+seeds:
+  - name: security_user_region
+    description: >
+      Row-level security mapping for the semantic model: which language regions each user
+      may see. Used by the dynamic role "Regional" through USERPRINCIPALNAME(). One row per
+      user and region; a user with several regions has several rows. E-mail addresses are
+      stored in lower case because the semantic model compares text case-sensitively.
+    columns:
+      - name: user_email
+        tests: [not_null]
+      - name: language_region
+        tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: ['German', 'French', 'Italian', 'Bilingual', 'Multilingual']
